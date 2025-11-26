@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" role="img" aria-labelledby="title">
+  <title>Decentralized finance network illustration</title>
+  <defs>
+    <linearGradient id="defiBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="var(--accent-primary)" stop-opacity="0.16" />
+      <stop offset="100%" stop-color="var(--accent-secondary)" stop-opacity="0.08" />
+    </linearGradient>
+  </defs>
+  <rect width="400" height="300" rx="32" fill="url(#defiBg)" />
+  <g fill="none" stroke="var(--accent-primary)" stroke-opacity="0.4" stroke-width="2">
+    <path d="M120 110c40-40 120-40 160 0" />
+    <path d="M120 190c40 40 120 40 160 0" />
+    <path d="M110 150h180" />
+  </g>
+  <g fill="var(--background)" opacity="0.85" stroke="var(--accent-primary)" stroke-width="2">
+    <circle cx="120" cy="110" r="24" />
+    <circle cx="200" cy="70" r="24" />
+    <circle cx="280" cy="110" r="24" />
+    <circle cx="120" cy="190" r="24" />
+    <circle cx="200" cy="230" r="24" />
+    <circle cx="280" cy="190" r="24" />
+  </g>
+  <g fill="var(--accent-primary)" fill-opacity="0.9">
+    <path d="M200 70l10 18h-20l10-18z" />
+    <path d="M120 110l10 18h-20l10-18z" />
+    <path d="M280 110l10 18h-20l10-18z" />
+    <path d="M120 190l10 18h-20l10-18z" />
+    <path d="M280 190l10 18h-20l10-18z" />
+    <path d="M200 230l10 18h-20l10-18z" />
+  </g>
+  <circle cx="200" cy="150" r="36" fill="var(--accent-primary)" fill-opacity="0.75" />
+  <path d="M200 132l-14 24h28l-14-24zm-18 32h36l-18 24-18-24z" fill="var(--background)" opacity="0.9" />
+</svg>

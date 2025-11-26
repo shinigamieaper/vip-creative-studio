@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" role="img" aria-labelledby="title">
+  <title>Abstract crypto investment illustration</title>
+  <defs>
+    <linearGradient id="coinGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="var(--accent-primary)" stop-opacity="0.9" />
+      <stop offset="100%" stop-color="var(--accent-secondary)" stop-opacity="0.85" />
+    </linearGradient>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="var(--accent-primary)" stop-opacity="0.18" />
+      <stop offset="100%" stop-color="var(--accent-secondary)" stop-opacity="0.08" />
+    </linearGradient>
+  </defs>
+  <rect width="400" height="300" rx="32" fill="url(#bgGradient)" />
+  <circle cx="200" cy="140" r="96" fill="url(#coinGradient)" />
+  <circle cx="200" cy="140" r="72" fill="var(--background)" opacity="0.55" />
+  <path d="M200 88c23 0 42 19 42 42s-19 42-42 42-42-19-42-42 19-42 42-42zm0 18c-13 0-24 11-24 24s11 24 24 24 24-11 24-24-11-24-24-24z" fill="var(--accent-primary)" opacity="0.9" />
+  <path d="M200 70l-10 22h20l-10-22zm0 142l10-22h-20l10 22z" fill="var(--accent-primary)" opacity="0.6" />
+  <path d="M128 140l22 10v-20l-22 10zm144 0l-22-10v20l22-10z" fill="var(--accent-primary)" opacity="0.6" />
+  <circle cx="90" cy="220" r="28" fill="var(--accent-primary)" opacity="0.2" />
+  <rect x="282" y="210" width="68" height="36" rx="12" fill="var(--accent-primary)" opacity="0.2" />
+</svg>

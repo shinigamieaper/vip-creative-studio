@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" role="img" aria-labelledby="title">
+  <title>Fintech lessons illustration</title>
+  <defs>
+    <linearGradient id="fintechBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="var(--accent-secondary)" stop-opacity="0.2" />
+      <stop offset="100%" stop-color="var(--accent-primary)" stop-opacity="0.1" />
+    </linearGradient>
+  </defs>
+  <rect width="400" height="300" rx="32" fill="url(#fintechBg)" />
+  <rect x="80" y="90" width="240" height="140" rx="24" fill="var(--background)" opacity="0.85" />
+  <path d="M120 120h80" stroke="var(--accent-primary)" stroke-width="10" stroke-linecap="round" opacity="0.7" />
+  <path d="M120 150h120" stroke="var(--accent-primary)" stroke-width="10" stroke-linecap="round" opacity="0.5" />
+  <path d="M120 180h100" stroke="var(--accent-primary)" stroke-width="10" stroke-linecap="round" opacity="0.35" />
+  <circle cx="260" cy="140" r="20" fill="var(--accent-primary)" opacity="0.8" />
+  <circle cx="260" cy="180" r="20" fill="var(--accent-secondary)" opacity="0.6" />
+  <path d="M260 120v120" stroke="var(--accent-primary)" stroke-width="4" stroke-dasharray="6 8" opacity="0.4" />
+  <circle cx="110" cy="230" r="24" fill="var(--accent-primary)" opacity="0.18" />
+  <circle cx="300" cy="70" r="26" fill="var(--accent-secondary)" opacity="0.2" />
+</svg>

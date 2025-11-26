@@ -1,0 +1,17 @@
+{
+  "name": "VIP Creative Studio",
+  "short_name": "VIP Creative",
+  "description": "Fractional marketing for credit unions and financial institutions",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#FF8C00",
+  "icons": [
+    {
+      "src": "/viplogocircle.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
