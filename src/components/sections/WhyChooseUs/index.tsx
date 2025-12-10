@@ -201,15 +201,15 @@ const WhyChooseUs: React.FC<WhyChooseUsProps> = ({
                     <Target className="h-6 w-6 text-white" />
                   </div>
                   
-                  <h3 className="h3 text-white mb-4">
+                  <h3 className="h3 text-primary mb-4">
                     {resolvedHighlight.title ?? 'Flexible Partnership Models'}
                   </h3>
                   
-                  <p className="body-default text-white/80 mb-8">
+                  <p className="body-default text-primary/80 mb-8">
                     {resolvedHighlight.body ?? defaultHighlight.body}
                   </p>
                   
-                  <ul className="space-y-3 text-white/70 body-small mb-8">
+                  <ul className="space-y-3 text-primary/70 body-small mb-8">
                     <li className="flex items-start gap-2">
                       <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-white" />
                       <span>Month-to-month agility</span>

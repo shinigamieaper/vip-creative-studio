@@ -36,7 +36,7 @@ const FeaturedResourceHero: React.FC<FeaturedResourceHeroProps> = ({
       <div className="w-full max-w-[1140px] mx-auto px-6 md:px-10">
         <div className="mb-6 flex items-center justify-between gap-4">
           <div className="space-y-1">
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary/60">
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent-primary">
               Featured
             </p>
             <h2 className="font-heading font-black text-primary text-2xl sm:text-3xl tracking-tight">

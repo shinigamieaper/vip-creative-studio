@@ -48,28 +48,13 @@ const defaultLinkGroups: FooterLinkGroup[] = [
       { label: "Terms & Conditions", href: "/terms-of-service" },
       { label: "Privacy Notice", href: "/privacy-policy" },
       { label: "Cookie Policy", href: "/cookie-policy" },
-      { label: "Accessibility Statement", href: "/accessibility" },
+      // Accessibility link temporarily removed
     ],
   },
 ];
 
-const defaultSocialIcons: FooterSocialIcon[] = [
-  {
-    platform: "linkedin",
-    label: "Visit VIP Creative Studio on LinkedIn",
-    url: "https://linkedin.com",
-  },
-  {
-    platform: "twitter",
-    label: "Visit VIP Creative Studio on Twitter",
-    url: "https://twitter.com",
-  },
-  {
-    platform: "instagram",
-    label: "Visit VIP Creative Studio on Instagram",
-    url: "https://instagram.com",
-  },
-];
+// Social media links temporarily disabled until SM pages are active
+const defaultSocialIcons: FooterSocialIcon[] = [];
 
 const socialIconComponents: Record<string, React.ComponentType<{ className?: string }>> = {
   linkedin: Linkedin,
@@ -138,7 +123,7 @@ const Footer: React.FC<FooterProps> = ({ footer }) => {
             >
               {/* Email */}
               <a
-                href="mailto:hello@vipcreativestudio.com"
+                href="mailto: hello@vipcreative.studio"
                 className="inline-flex items-center gap-2 text-base sm:text-lg font-heading font-semibold tracking-tight text-primary hover:text-accent-primary transition-colors duration-300 group"
               >
                 <svg
@@ -156,7 +141,7 @@ const Footer: React.FC<FooterProps> = ({ footer }) => {
                   <path d="m22 7-8.991 5.727a2 2 0 0 1-2.009 0L2 7" />
                   <rect x="2" y="4" width="20" height="16" rx="2" />
                 </svg>
-                <span>hello@vipcreativestudio.com</span>
+                <span> hello@vipcreative.studio</span>
               </a>
 
               {/* Schedule Call */}
@@ -207,35 +192,37 @@ const Footer: React.FC<FooterProps> = ({ footer }) => {
                 </div>
               ))}
 
-              {/* Social */}
-              <div>
-                <p className="font-body text-xs text-primary/60 mb-2">Connect</p>
-                <div className="flex items-center gap-3">
-                  {socialIcons.map((icon, index) => {
-                    const IconComponent =
-                      socialIconComponents[icon.platform.toLowerCase()] ?? Linkedin;
+              {/* Social - temporarily hidden until SM pages are active */}
+              {socialIcons.length > 0 && (
+                <div>
+                  <p className="font-body text-xs text-primary/60 mb-2">Connect</p>
+                  <div className="flex items-center gap-3">
+                    {socialIcons.map((icon, index) => {
+                      const IconComponent =
+                        socialIconComponents[icon.platform.toLowerCase()] ?? Linkedin;
 
-                    return (
-                      <a
-                        key={`${icon.platform}-${index}`}
-                        href={icon.url}
-                        target="_blank"
-                        rel="noreferrer"
-                        aria-label={icon.label}
-                        className={`inline-flex h-10 w-10 items-center justify-center rounded-full border border-standard/60 text-primary/70 bg-card/60 backdrop-blur-sm transition-all duration-300 hover:text-accent-primary hover:border-accent-primary/70 hover:-translate-y-0.5 hover:shadow-md ${
-                          hoveredSocial === index
-                            ? "text-accent-primary border-accent-primary/70 shadow-md -translate-y-0.5"
-                            : ""
-                        }`}
-                        onMouseEnter={() => setHoveredSocial(index)}
-                        onMouseLeave={() => setHoveredSocial(null)}
-                      >
-                        <IconComponent className="h-5 w-5" aria-hidden="true" />
-                      </a>
-                    );
-                  })}
+                      return (
+                        <a
+                          key={`${icon.platform}-${index}`}
+                          href={icon.url}
+                          target="_blank"
+                          rel="noreferrer"
+                          aria-label={icon.label}
+                          className={`inline-flex h-10 w-10 items-center justify-center rounded-full border border-standard/60 text-primary/70 bg-card/60 backdrop-blur-sm transition-all duration-300 hover:text-accent-primary hover:border-accent-primary/70 hover:-translate-y-0.5 hover:shadow-md ${
+                            hoveredSocial === index
+                              ? "text-accent-primary border-accent-primary/70 shadow-md -translate-y-0.5"
+                              : ""
+                          }`}
+                          onMouseEnter={() => setHoveredSocial(index)}
+                          onMouseLeave={() => setHoveredSocial(null)}
+                        >
+                          <IconComponent className="h-5 w-5" aria-hidden="true" />
+                        </a>
+                      );
+                    })}
+                  </div>
                 </div>
-              </div>
+              )}
             </motion.div>
 
             {/* Copyright */}

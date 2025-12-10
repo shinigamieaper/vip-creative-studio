@@ -481,7 +481,7 @@ const Testimonials: React.FC<TestimonialProps> = ({
             />
           </h2>
           <p className="subtext-large text-primary/80 max-w-[860px] mx-auto mt-4">
-            Every testimonial pairs a story with measurable winsdive into the numbers, the strategies, and the momentum we create together.
+            Every testimonial pairs a story with measurable winsdive into the numbers, the strategies, and the momentum we create together.
           </p>
         </div>
 

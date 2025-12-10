@@ -55,6 +55,11 @@ export default defineConfig({
               ),
             S.divider(),
             S.listItem()
+              .title("Legal Pages")
+              .child(
+                S.documentTypeList("legalPage").title("Legal Pages")
+              ),
+            S.listItem()
               .title("Services")
               .child(
                 S.documentTypeList("service").title("Services")

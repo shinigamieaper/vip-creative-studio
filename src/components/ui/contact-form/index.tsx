@@ -60,17 +60,50 @@ const ContactForm: React.FC<ContactFormProps> = ({
     e.preventDefault();
     setIsSubmitting(true);
 
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1200));
+    try {
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          ...formData,
+          source: "contact_page",
+        }),
+      });
 
-    // Log form data - backend integration will handle actual submission
-    console.log("Contact form submitted:", formData);
+      if (!response.ok) {
+        const data = await response.json().catch(() => null);
+        const message = data?.error || "Unable to submit right now. Please try again later.";
+        if (typeof window !== "undefined") {
+          alert(message);
+        }
+        return;
+      }
 
-    // TODO: Send to backend API
+      // Log form data - backend integration will handle actual submission
+      console.log("Contact form submitted:", formData);
 
-    setIsSubmitting(false);
-    setSubmitted(true);
-    onSubmit?.(e);
+      // TODO: Send to backend API
+
+      setSubmitted(true);
+      onSubmit?.(e);
+
+      if (typeof window !== "undefined" && (window as any).dataLayer) {
+        (window as any).dataLayer.push({
+          event: "form_submit",
+          form_type: "contact",
+          source: "contact_page",
+        });
+      }
+    } catch (error) {
+      console.error("Error submitting contact form:", error);
+      if (typeof window !== "undefined") {
+        alert("Unable to submit right now. Please try again later.");
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleReset = () => {

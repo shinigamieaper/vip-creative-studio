@@ -294,6 +294,21 @@ export const resourceSlugsQuery = groq`
   *[_type == "resource"] { "slug": slug.current }
 `;
 
+export const legalPageByKeyQuery = groq`
+  *[_type == "legalPage" && key == $key][0] {
+    key,
+    title,
+    lastUpdated,
+    intro,
+    body,
+    seo {
+      metaTitle,
+      metaDescription,
+      ogImage
+    }
+  }
+`;
+
 // ============================================================================
 // TESTIMONIAL QUERIES
 // ============================================================================

@@ -9,7 +9,7 @@ import Confetti from "react-confetti";
 export interface ResourceLeadModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (data: { email: string; companyName: string }) => void;
+  onSubmit: (data: { email: string; companyName: string }) => void | Promise<void>;
   resourceTitle: string;
   resourceType: "download" | "webinar";
   /** Optional: The format of the download (e.g., "PDF", "Excel") */
@@ -76,12 +76,18 @@ export function ResourceLeadModal({
 
     setIsSubmitting(true);
 
-    // Simulate API call (replace with actual newsletter signup)
-    await new Promise((resolve) => setTimeout(resolve, 800));
-
-    onSubmit({ email, companyName });
-    setIsSubmitting(false);
-    setSubmitted(true);
+    try {
+      const result = onSubmit({ email, companyName });
+      if (result && typeof (result as any).then === "function") {
+        await result;
+      }
+      setSubmitted(true);
+    } catch (error) {
+      console.error("Error submitting resource lead:", error);
+      setError("Something went wrong. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleClose = () => {

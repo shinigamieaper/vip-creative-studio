@@ -113,8 +113,9 @@ const FAQ: React.FC<FAQProps> = ({ className = '', items, subtitle, ...props }) 
               : undefined;
 
             const cardBgClass = hasColor ? "" : "bg-card";
-            const textColor = hasColor ? "text-white" : "text-primary";
-            const textMuted = hasColor ? "text-white/80" : "text-primary/70";
+            const usesLightText = isOrange;
+            const textColor = usesLightText ? "text-white" : "text-primary";
+            const textMuted = usesLightText ? "text-white/80" : "text-primary/70";
             const iconBg = hasColor ? "bg-white/20" : "bg-accent-primary/10";
             const iconColor = hasColor ? "text-white" : "text-accent-primary";
 

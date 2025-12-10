@@ -43,6 +43,7 @@ const HomepageHero: React.FC<HomepageHeroProps> = ({
     heroSubtitle ??
     'We cut through the complexity of credit union marketing, delivering quantifiable results by becoming a seamless extension of your team.';
   const resolvedPrimaryLabel = primaryCtaLabel ?? 'Book a Discovery Call';
+  const resolvedPrimaryHref = primaryCtaHref ?? '/contact';
   const resolvedSecondaryLabel = secondaryCtaLabel ?? 'Our Partnership Models';
   const resolvedSecondaryHref = secondaryCtaHref ?? '/our-partnership-model';
 
@@ -83,8 +84,8 @@ const HomepageHero: React.FC<HomepageHeroProps> = ({
             </p>
 
             <div className="flex flex-col sm:flex-row justify-center items-center gap-4 sm:gap-6">
-              <PrimaryCtaButton shimmer shimmerGradient withArrow>
-                {resolvedPrimaryLabel}
+              <PrimaryCtaButton shimmer shimmerGradient withArrow asChild>
+                <a href={resolvedPrimaryHref}>{resolvedPrimaryLabel}</a>
               </PrimaryCtaButton>
 
               <PrimaryCtaButton

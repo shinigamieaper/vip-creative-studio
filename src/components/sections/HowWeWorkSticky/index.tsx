@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from 'react';
-import { motion, useScroll } from 'framer-motion';
-import { Search, Lightbulb, Rocket, TrendingUp, Check } from 'lucide-react';
+import React, { useRef, useState } from 'react';
+import { motion } from 'framer-motion';
+import { Search, Lightbulb, Rocket, TrendingUp, Check, ChevronUp, ChevronDown } from 'lucide-react';
 
 interface ProcessStep {
   number: string;
@@ -132,9 +132,8 @@ const HowWeWorkSticky: React.FC<HowWeWorkStickyProps> = ({
   subtitle,
   ...props
 }) => {
-  // Track scroll within this section to determine which card is active
+  // Manual navigation instead of scroll-based
   const containerRef = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({ target: containerRef, offset: ["start start", "end end"] });
   const [activeIndex, setActiveIndex] = useState(0);
 
   const stepsToRender: ProcessStep[] =
@@ -151,14 +150,13 @@ const HowWeWorkSticky: React.FC<HowWeWorkStickyProps> = ({
   const resolvedSubtitle =
     subtitle ?? 'A proven approach to transform your marketing strategy';
 
-  useEffect(() => {
-    const unsubscribe = scrollYProgress.on("change", (v) => {
-      const steps = stepsToRender.length;
-      const idx = Math.min(steps - 1, Math.max(0, Math.floor(v * steps)));
-      setActiveIndex(idx);
-    });
-    return () => unsubscribe();
-  }, [scrollYProgress, stepsToRender.length]);
+  const goToNext = () => {
+    setActiveIndex((prev) => Math.min(stepsToRender.length - 1, prev + 1));
+  };
+
+  const goToPrev = () => {
+    setActiveIndex((prev) => Math.max(0, prev - 1));
+  };
 
   return (
     <section className={`py-24 px-4 ${className}`} {...props}>
@@ -173,26 +171,62 @@ const HowWeWorkSticky: React.FC<HowWeWorkStickyProps> = ({
           </p>
         </div>
 
-        {/* Sticky Stack Container */}
-        <div ref={containerRef} className="relative isolate" style={{ minHeight: `${stepsToRender.length * 700}px` }}>
-          {stepsToRender.map((step, index) => (
-            <div
-              key={step.number}
-              className="sticky mb-8"
-              style={{ 
-                top: `${4 + index * 1}rem`, 
-                zIndex: index === activeIndex ? 100 : 0,
-                visibility: index === activeIndex ? 'visible' : 'hidden'
-              }}
-            >
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: index === activeIndex ? 1 : 0, y: index === activeIndex ? 0 : 20 }}
-                transition={{ duration: 0.3 }}
-                className="relative max-w-[900px] mx-auto rounded-3xl border border-standard overflow-hidden bg-card isolate shadow-[0_8px_24px_rgba(15,23,42,0.06)] hover:shadow-[0_10px_30px_rgba(15,23,42,0.08)] transition-shadow duration-300"
-                style={{ pointerEvents: index === activeIndex ? 'auto' : 'none' }}
-                aria-hidden={index !== activeIndex}
+        {/* Card Container with Side Arrows */}
+        <div ref={containerRef} className="relative isolate flex items-center justify-center gap-4 md:gap-8">
+          {/* Left Arrow (Up) */}
+          <button
+            onClick={goToPrev}
+            disabled={activeIndex === 0}
+            className="hidden md:flex flex-shrink-0 w-14 h-14 rounded-full items-center justify-center transition-all duration-200"
+            style={{
+              backgroundColor: activeIndex === 0 ? 'hsl(var(--border-standard))' : 'hsl(var(--accent-secondary))',
+              color: activeIndex === 0 ? 'hsl(var(--text-primary) / 0.3)' : '#ffffff',
+              cursor: activeIndex === 0 ? 'not-allowed' : 'pointer',
+              boxShadow: activeIndex === 0 ? 'none' : '0 4px 14px hsl(var(--accent-secondary) / 0.4)',
+            }}
+            onMouseEnter={(e) => {
+              if (activeIndex !== 0) {
+                e.currentTarget.style.transform = 'scale(1.1)';
+                e.currentTarget.style.boxShadow = '0 6px 20px hsl(var(--accent-secondary) / 0.5)';
+              }
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'scale(1)';
+              e.currentTarget.style.boxShadow = activeIndex === 0 ? 'none' : '0 4px 14px hsl(var(--accent-secondary) / 0.4)';
+            }}
+            onMouseDown={(e) => {
+              if (activeIndex !== 0) {
+                e.currentTarget.style.transform = 'scale(0.95)';
+              }
+            }}
+            onMouseUp={(e) => {
+              if (activeIndex !== 0) {
+                e.currentTarget.style.transform = 'scale(1.1)';
+              }
+            }}
+            aria-label="Previous step"
+          >
+            <ChevronUp className="w-7 h-7" />
+          </button>
+
+          {/* Card */}
+          <div className="flex-1 max-w-[900px]">
+            {stepsToRender.map((step, index) => (
+              <div
+                key={step.number}
+                className={`${index === activeIndex ? 'block' : 'hidden'}`}
               >
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3 }}
+                  key={`step-card-${activeIndex}`}
+                  className="relative rounded-3xl overflow-hidden bg-card isolate"
+                  style={{
+                    border: '1px solid hsl(var(--border-standard))',
+                    boxShadow: '0 8px 24px rgba(15,23,42,0.06)',
+                  }}
+                >
                 <div className={`absolute inset-0 opacity-20 bg-linear-to-br ${step.tintColor} pointer-events-none`} />
                 
                 <div className="relative p-6 sm:p-10">
@@ -285,9 +319,95 @@ const HowWeWorkSticky: React.FC<HowWeWorkStickyProps> = ({
                     )}
                   </div>
                 </div>
+
+                {/* Step indicator and mobile nav */}
+                <div className="flex justify-center items-center gap-3 px-6 pb-6 sm:px-10 sm:pb-8">
+                  {/* Mobile Previous */}
+                  <button
+                    onClick={goToPrev}
+                    disabled={activeIndex === 0}
+                    className="md:hidden flex w-10 h-10 rounded-full items-center justify-center transition-all duration-200"
+                    style={{
+                      backgroundColor: activeIndex === 0 ? 'hsl(var(--border-standard))' : 'hsl(var(--accent-secondary))',
+                      color: activeIndex === 0 ? 'hsl(var(--text-primary) / 0.3)' : '#ffffff',
+                      cursor: activeIndex === 0 ? 'not-allowed' : 'pointer',
+                    }}
+                    aria-label="Previous step"
+                  >
+                    <ChevronUp className="w-5 h-5" />
+                  </button>
+
+                  {/* Dots */}
+                  <div className="flex items-center justify-center gap-2">
+                    {stepsToRender.map((_, idx) => (
+                      <button
+                        key={idx}
+                        onClick={() => setActiveIndex(idx)}
+                        className="w-3 h-3 rounded-full transition-all duration-300"
+                        style={{
+                          backgroundColor: idx === activeIndex ? 'hsl(var(--accent-primary))' : 'hsl(var(--text-primary) / 0.2)',
+                          transform: idx === activeIndex ? 'scale(1.25)' : 'scale(1)',
+                        }}
+                        aria-label={`Go to step ${idx + 1}`}
+                      />
+                    ))}
+                  </div>
+
+                  {/* Mobile Next */}
+                  <button
+                    onClick={goToNext}
+                    disabled={activeIndex === stepsToRender.length - 1}
+                    className="md:hidden flex w-10 h-10 rounded-full items-center justify-center transition-all duration-200"
+                    style={{
+                      backgroundColor: activeIndex === stepsToRender.length - 1 ? 'hsl(var(--border-standard))' : 'hsl(var(--accent-primary))',
+                      color: activeIndex === stepsToRender.length - 1 ? 'hsl(var(--text-primary) / 0.3)' : '#ffffff',
+                      cursor: activeIndex === stepsToRender.length - 1 ? 'not-allowed' : 'pointer',
+                    }}
+                    aria-label="Next step"
+                  >
+                    <ChevronDown className="w-5 h-5" />
+                  </button>
+                </div>
               </motion.div>
             </div>
           ))}
+          </div>
+
+          {/* Right Arrow (Down) */}
+          <button
+            onClick={goToNext}
+            disabled={activeIndex === stepsToRender.length - 1}
+            className="hidden md:flex flex-shrink-0 w-14 h-14 rounded-full items-center justify-center transition-all duration-200"
+            style={{
+              backgroundColor: activeIndex === stepsToRender.length - 1 ? 'hsl(var(--border-standard))' : 'hsl(var(--accent-primary))',
+              color: activeIndex === stepsToRender.length - 1 ? 'hsl(var(--text-primary) / 0.3)' : '#ffffff',
+              cursor: activeIndex === stepsToRender.length - 1 ? 'not-allowed' : 'pointer',
+              boxShadow: activeIndex === stepsToRender.length - 1 ? 'none' : '0 4px 14px hsl(var(--accent-primary) / 0.4)',
+            }}
+            onMouseEnter={(e) => {
+              if (activeIndex !== stepsToRender.length - 1) {
+                e.currentTarget.style.transform = 'scale(1.1)';
+                e.currentTarget.style.boxShadow = '0 6px 20px hsl(var(--accent-primary) / 0.5)';
+              }
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'scale(1)';
+              e.currentTarget.style.boxShadow = activeIndex === stepsToRender.length - 1 ? 'none' : '0 4px 14px hsl(var(--accent-primary) / 0.4)';
+            }}
+            onMouseDown={(e) => {
+              if (activeIndex !== stepsToRender.length - 1) {
+                e.currentTarget.style.transform = 'scale(0.95)';
+              }
+            }}
+            onMouseUp={(e) => {
+              if (activeIndex !== stepsToRender.length - 1) {
+                e.currentTarget.style.transform = 'scale(1.1)';
+              }
+            }}
+            aria-label="Next step"
+          >
+            <ChevronDown className="w-7 h-7" />
+          </button>
         </div>
       </div>
     </section>

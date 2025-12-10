@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import Script from "next/script";
 import "./globals.css";
 import { StaggeredMenu, Footer } from "@/components";
 import { siteConfig } from "@/lib/site-config";
@@ -6,6 +7,9 @@ import { getClient } from "@/lib/sanity/client";
 import { siteSettingsQuery } from "@/lib/sanity/queries";
 
 // Fonts are provided via Satoshi CDN link in <head> and CSS variables in globals.css
+
+const GTM_ID = process.env.NEXT_PUBLIC_GTM_ID;
+const CLARITY_ID = process.env.NEXT_PUBLIC_CLARITY_ID;
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.url),
@@ -63,6 +67,7 @@ export const metadata: Metadata = {
     apple: "/viplogocircle.png",
   },
   manifest: "/site.webmanifest",
+  
 };
 
 export const viewport: Viewport = {
@@ -91,6 +96,40 @@ export default async function RootLayout({
         />
       </head>
       <body className="antialiased min-h-screen bg-linear-to-br from-[hsl(var(--accent-primary)/0.15)] to-[hsl(var(--accent-secondary)/0.15)]" suppressHydrationWarning>
+        {GTM_ID && (
+          <>
+            <Script
+              id="gtm-base"
+              strategy="afterInteractive"
+            >{`(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','${GTM_ID}');`}</Script>
+            <noscript>
+              <iframe
+                src={`https://www.googletagmanager.com/ns.html?id=${GTM_ID}`}
+                height="0"
+                width="0"
+                style={{ display: "none", visibility: "hidden" }}
+              />
+            </noscript>
+          </>
+        )}
+        {CLARITY_ID && (
+          <Script
+            id="ms-clarity"
+            strategy="afterInteractive"
+            dangerouslySetInnerHTML={{
+              __html: `
+                (function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+                t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+                y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+                })(window, document, "clarity", "script", "${CLARITY_ID}");
+              `,
+            }}
+          />
+        )}
         <StaggeredMenu
           isFixed={true}
           position="right"
@@ -101,12 +140,8 @@ export default async function RootLayout({
             { label: "Content\u00a0Hub", ariaLabel: "Explore insights, success stories, and resources", link: "/resources" },
             { label: "Contact", ariaLabel: "Get in touch", link: "/contact" },
           ]}
-          socialItems={[
-            { label: "Twitter", link: "https://twitter.com" },
-            { label: "GitHub", link: "https://github.com" },
-            { label: "LinkedIn", link: "https://linkedin.com" },
-          ]}
-          displaySocials={true}
+          socialItems={[]}
+          displaySocials={false}
           displayItemNumbering={true}
           menuButtonColor={"hsl(var(--text-primary))"}
           openMenuButtonColor={"hsl(var(--text-primary))"}

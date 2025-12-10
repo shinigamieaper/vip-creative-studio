@@ -80,7 +80,7 @@ const FinalCTA: React.FC<FinalCTAProps> = ({ className = '', ...props }) => {
                     transition={{ duration: 0.4, delay: 0.1 + index * 0.05 }}
                     className={`flex items-center justify-center gap-2 text-sm font-medium px-4 py-2 rounded-full ${
                       isAccent 
-                        ? "text-white" 
+                        ? "text-primary" 
                         : "text-primary/80"
                     }`}
                     style={isAccent ? { backgroundColor: "hsl(var(--accent-secondary))" } : undefined}

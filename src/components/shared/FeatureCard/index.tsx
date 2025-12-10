@@ -51,9 +51,11 @@ const FeatureCard: React.FC<FeatureCardProps> = ({
     : undefined;
 
   // Text colors
-  const titleColor = hasColor ? "text-white" : "text-primary";
-  const descColor = hasColor ? "text-white/80" : "text-primary/70";
-  const eyebrowColor = hasColor ? "text-white/70" : "text-primary/60";
+  // Teal cards should use dark text for readability; orange and dark stay on white text
+  const usesLightText = isOrange || isDark;
+  const titleColor = usesLightText ? "text-white" : "text-primary";
+  const descColor = usesLightText ? "text-white/80" : "text-primary/70";
+  const eyebrowColor = usesLightText ? "text-white/70" : "text-primary/60";
 
   // Icon background
   const iconBgClass = hasColor
@@ -63,7 +65,7 @@ const FeatureCard: React.FC<FeatureCardProps> = ({
     : "bg-accent-primary/10";
 
   // Icon color override for colored cards
-  const iconColor = hasColor ? "text-white" : undefined;
+  const iconColor = usesLightText ? "text-white" : undefined;
 
   const accentBg =
     accent === "secondary"

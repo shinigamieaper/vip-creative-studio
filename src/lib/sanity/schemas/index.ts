@@ -14,6 +14,7 @@ import globalProcess from "./global-process";
 import faqGroup from "./faq-group";
 import partnershipPhilosophy from "./partnership-philosophy";
 import kpiHighlights from "./kpi-highlights";
+import legalPage from "./legal-page";
 
 export const schemaTypes = [
   // Document types
@@ -32,6 +33,7 @@ export const schemaTypes = [
   faqGroup,
   partnershipPhilosophy,
   kpiHighlights,
+  legalPage,
   // Object types
   blockContent,
 ];

@@ -69,7 +69,7 @@ const PrimaryCtaButton: React.FC<PrimaryCtaButtonProps> = ({
   const computedStyle: React.CSSProperties = {
     ...(props.style || {}),
     ...(variant === 'inverted'
-      ? ({ color: 'oklch(0.985 0 0)', borderColor: 'hsl(var(--accent-secondary))' } as React.CSSProperties)
+      ? ({ color: 'hsl(var(--text-primary))', borderColor: 'hsl(var(--accent-secondary))' } as React.CSSProperties)
       : {}),
     ...(((shimmer || shimmerGradient) && shimmerSpeedSeconds)
       ? ({ ['--shimmer-duration' as any]: `${shimmerSpeedSeconds}s` } as React.CSSProperties)

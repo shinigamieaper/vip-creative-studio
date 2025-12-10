@@ -45,6 +45,7 @@ const ServicesHero: React.FC<ServicesHeroProps> = ({
     description ??
     "We don't just execute campaigns\u2014we become an integral part of your team, bringing strategic expertise and creative excellence to every initiative.";
   const resolvedPrimaryLabel = primaryCtaLabel ?? 'Book a Discovery Call';
+  const resolvedPrimaryHref = primaryCtaHref ?? '/contact';
   const resolvedSecondaryLabel = secondaryCtaLabel ?? 'Explore Our Services';
   const resolvedSecondaryHref = secondaryCtaHref ?? '#services';
 
@@ -97,8 +98,8 @@ const ServicesHero: React.FC<ServicesHeroProps> = ({
 
                 {showCtas && (
                   <div className="flex flex-col sm:flex-row justify-center items-center gap-4 sm:gap-6">
-                    <PrimaryCtaButton shimmer shimmerGradient withArrow>
-                      {resolvedPrimaryLabel}
+                    <PrimaryCtaButton shimmer shimmerGradient withArrow asChild>
+                      <a href={resolvedPrimaryHref}>{resolvedPrimaryLabel}</a>
                     </PrimaryCtaButton>
 
                     {showSecondary && (

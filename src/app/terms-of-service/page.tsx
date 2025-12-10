@@ -1,12 +1,76 @@
 import type { Metadata } from "next";
-import { BlurText } from "@/components";
+import { BlurText, PortableTextRenderer } from "@/components";
+import { getClient } from "@/lib/sanity/client";
+import { legalPageByKeyQuery } from "@/lib/sanity/queries";
 
-export const metadata: Metadata = {
+const DEFAULT_TERMS_METADATA: Metadata = {
   title: "Terms of Service | VIP Creative Studio",
   description: "Website terms of use for VIP Creative Studio.",
+  openGraph: {
+    title: "Terms of Service | VIP Creative Studio",
+    description: "Website terms of use for VIP Creative Studio.",
+  },
 };
 
-export default function TermsOfServicePage() {
+export async function generateMetadata(): Promise<Metadata> {
+  try {
+    const legalPage = await getClient().fetch(legalPageByKeyQuery, {
+      key: "terms-of-service",
+    });
+    const seo = legalPage?.seo;
+
+    if (!seo) return DEFAULT_TERMS_METADATA;
+
+    return {
+      ...DEFAULT_TERMS_METADATA,
+      title: seo.metaTitle ?? DEFAULT_TERMS_METADATA.title,
+      description: seo.metaDescription ?? DEFAULT_TERMS_METADATA.description,
+      openGraph: {
+        ...(DEFAULT_TERMS_METADATA.openGraph ?? {}),
+        title: seo.metaTitle ?? DEFAULT_TERMS_METADATA.openGraph?.title,
+        description:
+          seo.metaDescription ??
+          DEFAULT_TERMS_METADATA.openGraph?.description,
+      },
+    };
+  } catch {
+    return DEFAULT_TERMS_METADATA;
+  }
+}
+
+interface LegalPage {
+  title?: string;
+  lastUpdated?: string;
+  intro?: string;
+  body?: any[];
+}
+
+async function getTermsLegalPage(): Promise<LegalPage | null> {
+  try {
+    const legalPage = await getClient().fetch(legalPageByKeyQuery, {
+      key: "terms-of-service",
+    });
+    return (legalPage as LegalPage) ?? null;
+  } catch {
+    return null;
+  }
+}
+
+export default async function TermsOfServicePage() {
+  const legalPage = await getTermsLegalPage();
+
+  const title = legalPage?.title ?? "Website Terms of Use";
+
+  const lastUpdatedText = legalPage?.lastUpdated
+    ? new Intl.DateTimeFormat("en-US", {
+        month: "long",
+        day: "numeric",
+        year: "numeric",
+      }).format(new Date(legalPage.lastUpdated))
+    : "November 25, 2025";
+
+  const hasCmsBody = Array.isArray(legalPage?.body) && legalPage.body.length > 0;
+
   return (
     <main className="min-h-screen">
       <section className="py-24 px-4">
@@ -14,7 +78,7 @@ export default function TermsOfServicePage() {
           <h1 className="h1 text-primary">
             <BlurText
               as="span"
-              text="Website Terms of Use"
+              text={title}
               className="text-primary"
               textClassName="text-primary"
               animateBy="words"
@@ -23,16 +87,24 @@ export default function TermsOfServicePage() {
           </h1>
 
           <p className="body-default text-primary/70">
-            Last updated: November 25, 2025
+            Last updated: {lastUpdatedText}
           </p>
 
-          <p className="body-default text-primary/80">
-            These Terms of Use ("Terms") describe the rules that apply to your use of the
-            VIP Creative Studio website (the "Site"). By accessing or using the Site,
-            you agree to be bound by these Terms. If you do not agree, please do not use
-            the Site.
-          </p>
+          {legalPage?.intro ? (
+            <p className="body-default text-primary/80">{legalPage.intro}</p>
+          ) : (
+            <p className="body-default text-primary/80">
+              These Terms of Use ("Terms") describe the rules that apply to your use
+              of the VIP Creative Studio website (the "Site"). By accessing or using
+              the Site, you agree to be bound by these Terms. If you do not agree,
+              please do not use the Site.
+            </p>
+          )}
 
+          {hasCmsBody ? (
+            <PortableTextRenderer value={legalPage!.body} />
+          ) : (
+            <>
           <section className="space-y-4">
             <h2 className="font-heading text-xl sm:text-2xl text-primary">
               1. Who we are
@@ -189,13 +261,15 @@ export default function TermsOfServicePage() {
             <p className="body-default text-primary/80">
               Email: {" "}
               <a
-                href="mailto:hello@vipcreativestudio.com"
+                href="mailto: hello@vipcreative.studio"
                 className="text-accent-primary underline-offset-2 hover:underline"
               >
-                hello@vipcreativestudio.com
+                 hello@vipcreative.studio
               </a>
             </p>
           </section>
+            </>
+          )}
         </div>
       </section>
     </main>

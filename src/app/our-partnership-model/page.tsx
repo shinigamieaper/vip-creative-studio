@@ -72,7 +72,7 @@ export default async function PartnershipModelPage() {
 
   const fallbackTitle = "More Than a Vendor. We're Your Fractional Partner for";
   const fallbackSubtitle =
-    "We don't just execute campaignswe become an integral part of your team, bringing strategic expertise and creative excellence to every initiative.";
+    "We don't just execute campaigns we become an integral part of your team, bringing strategic expertise and creative excellence to every initiative.";
   const fallbackPrimaryCta = {
     label: "Book a Discovery Call",
     href: "/contact",
@@ -104,7 +104,7 @@ export default async function PartnershipModelPage() {
 
   const faqSubtitle =
     partnershipFaqGroup?.subtitle ||
-    "How our fractional partnership model works in practicebefore you commit.";
+    "How our fractional partnership model works in practice before you commit.";
 
   return (
     <main className="min-h-screen">

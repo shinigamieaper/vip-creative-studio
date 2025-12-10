@@ -103,7 +103,7 @@ const TeamIDCards: React.FC<TeamIDCardsProps> = ({
             bio: doc.bio ?? fallback.bio,
             email: "",
             phone: "",
-            portrait: portraitFromSanity ?? fallback.portrait,
+            portrait: portraitFromSanity ?? "",
             employeeId: fallback.employeeId,
           };
         })
@@ -194,28 +194,37 @@ const TeamIDCards: React.FC<TeamIDCardsProps> = ({
                   className="relative bg-white rounded-xl overflow-hidden border-2 border-standard backface-hidden h-[400px] shadow-[0_8px_24px_rgba(15,23,42,0.06)] hover:shadow-[0_10px_30px_rgba(15,23,42,0.08)] transition-shadow duration-300"
                   style={{ backfaceVisibility: "hidden" }}
                 >
-                  {/* Portrait - Fills entire card */}
-                  <div className="absolute inset-0 w-full h-full">
+                  {member.portrait ? (
                     <Image
                       src={member.portrait}
                       alt={member.name}
                       fill
+                      sizes="(max-width: 1280px) 100vw, 240px"
                       className="object-cover"
                     />
-                  </div>
+                  ) : (
+                    <>
+                      {/* Initials placeholder instead of portrait image */}
+                      <div className="absolute inset-0 w-full h-full bg-linear-to-br from-accent-primary/20 via-accent-secondary/10 to-primary/5 flex items-center justify-center">
+                        <span 
+                          className="text-[120px] font-heading font-black select-none opacity-20"
+                          style={{
+                            background: 'linear-gradient(135deg, hsl(var(--accent-primary)) 0%, hsl(var(--accent-secondary)) 100%)',
+                            WebkitBackgroundClip: 'text',
+                            WebkitTextFillColor: 'transparent',
+                            backgroundClip: 'text'
+                          }}
+                        >
+                          {member.name.split(' ').map(n => n[0]).join('')}
+                        </span>
+                      </div>
+                    </>
+                  )}
 
                   {/* Gradient Overlay for text readability */}
                   <div className="absolute inset-0 bg-linear-to-b from-transparent via-transparent to-text-primary/70 z-10" />
 
-                  {/* VIP Logo Watermark */}
-                  <div className="absolute top-3 right-3 w-16 h-16 md:w-20 md:h-20 opacity-60 z-20">
-                    <Image
-                      src="/viplogotransparentblack.png"
-                      alt="VIP Logo"
-                      fill
-                      className="object-contain"
-                    />
-                  </div>
+                  {/* VIP Logo Watermark - temporarily removed */}
 
                   {/* Bottom Info Strip */}
                   <div className="absolute bottom-0 left-0 right-0 bg-linear-to-r from-accent-primary via-accent-primary to-accent-secondary p-4 z-20">

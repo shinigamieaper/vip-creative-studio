@@ -17,6 +17,10 @@ export interface NewsletterSignupProps {
   ctaLabel?: string;
   /** Optional className for the wrapper */
   className?: string;
+  /** Optional source identifier for analytics and Mailchimp tags */
+  source?: string;
+  /** Optional resource slug when used on article pages */
+  resourceSlug?: string;
 }
 
 export function NewsletterSignup({
@@ -25,6 +29,8 @@ export function NewsletterSignup({
   description = "Join 2,000+ marketing leaders who receive our weekly digest of strategies, case studies, and industry trends.",
   ctaLabel = "Subscribe",
   className,
+  source = "newsletter",
+  resourceSlug,
 }: NewsletterSignupProps) {
   const [email, setEmail] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -60,16 +66,46 @@ export function NewsletterSignup({
 
     setIsSubmitting(true);
 
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    try {
+      const response = await fetch("/api/newsletter/subscribe", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email,
+          source,
+          resourceSlug,
+        }),
+      });
 
-    // Log for backend integration
-    console.log("Newsletter signup:", { email });
+      if (!response.ok) {
+        const data = await response.json().catch(() => null);
+        const message = data?.error || "Unable to subscribe right now. Please try again.";
+        setError(message);
+        return;
+      }
 
-    // TODO: Send to backend API
+      // Log for backend integration
+      console.log("Newsletter signup:", { email });
 
-    setIsSubmitting(false);
-    setSubmitted(true);
+      // TODO: Send to backend API
+
+      setSubmitted(true);
+
+      if (typeof window !== "undefined" && (window as any).dataLayer) {
+        (window as any).dataLayer.push({
+          event: "newsletter_subscribe",
+          source,
+          resourceSlug,
+        });
+      }
+    } catch (error) {
+      console.error("Error submitting newsletter signup:", error);
+      setError("Unable to subscribe right now. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const isDark = variant === "dark";

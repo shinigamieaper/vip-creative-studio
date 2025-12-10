@@ -116,10 +116,15 @@ const KPIHighlights: React.FC<KPIHighlightsProps> = ({ className = '', metricsFr
 
             const borderClass = hasColor ? "border-transparent" : "border-standard";
             const bgClass = hasColor ? "" : "bg-card";
-            const textColor = hasColor ? "text-white" : "text-primary";
-            const textMuted = hasColor ? "text-white/80" : "text-primary/80";
-            const textSubtle = hasColor ? "text-white/60" : "text-primary/60";
-            const iconBg = hasColor ? "bg-white/20 text-white" : "bg-accent-primary/10 text-accent-primary";
+            const usesLightText = isOrange;
+            const textColor = usesLightText ? "text-white" : "text-primary";
+            const textMuted = usesLightText ? "text-white/80" : "text-primary/80";
+            const textSubtle = usesLightText ? "text-white/60" : "text-primary/60";
+            const iconBg = usesLightText
+              ? "bg-white/20 text-white"
+              : isTeal
+              ? "bg-accent-secondary/10 text-accent-secondary"
+              : "bg-accent-primary/10 text-accent-primary";
 
             return (
               <motion.div

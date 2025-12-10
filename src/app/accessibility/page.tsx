@@ -1,12 +1,69 @@
 import type { Metadata } from "next";
-import { BlurText } from "@/components";
+import { BlurText, PortableTextRenderer } from "@/components";
+import { getClient } from "@/lib/sanity/client";
+import { legalPageByKeyQuery } from "@/lib/sanity/queries";
 
-export const metadata: Metadata = {
+const DEFAULT_ACCESSIBILITY_METADATA: Metadata = {
   title: "Accessibility Statement | VIP Creative Studio",
   description: "Accessibility commitment for the VIP Creative Studio website.",
+  openGraph: {
+    title: "Accessibility Statement | VIP Creative Studio",
+    description:
+      "Accessibility commitment for the VIP Creative Studio website.",
+  },
 };
 
-export default function AccessibilityPage() {
+export async function generateMetadata(): Promise<Metadata> {
+  try {
+    const legalPage = await getClient().fetch(legalPageByKeyQuery, {
+      key: "accessibility",
+    });
+    const seo = legalPage?.seo;
+
+    if (!seo) return DEFAULT_ACCESSIBILITY_METADATA;
+
+    return {
+      ...DEFAULT_ACCESSIBILITY_METADATA,
+      title: seo.metaTitle ?? DEFAULT_ACCESSIBILITY_METADATA.title,
+      description:
+        seo.metaDescription ?? DEFAULT_ACCESSIBILITY_METADATA.description,
+      openGraph: {
+        ...(DEFAULT_ACCESSIBILITY_METADATA.openGraph ?? {}),
+        title: seo.metaTitle ?? DEFAULT_ACCESSIBILITY_METADATA.openGraph?.title,
+        description:
+          seo.metaDescription ??
+          DEFAULT_ACCESSIBILITY_METADATA.openGraph?.description,
+      },
+    };
+  } catch {
+    return DEFAULT_ACCESSIBILITY_METADATA;
+  }
+}
+
+interface LegalPage {
+  title?: string;
+  intro?: string;
+  body?: any[];
+}
+
+async function getAccessibilityLegalPage(): Promise<LegalPage | null> {
+  try {
+    const legalPage = await getClient().fetch(legalPageByKeyQuery, {
+      key: "accessibility",
+    });
+    return (legalPage as LegalPage) ?? null;
+  } catch {
+    return null;
+  }
+}
+
+export default async function AccessibilityPage() {
+  const legalPage = await getAccessibilityLegalPage();
+
+  const title = legalPage?.title ?? "Accessibility Statement";
+
+  const hasCmsBody = Array.isArray(legalPage?.body) && legalPage.body.length > 0;
+
   return (
     <main className="min-h-screen">
       <section className="py-24 px-4">
@@ -14,7 +71,7 @@ export default function AccessibilityPage() {
           <h1 className="h1 text-primary">
             <BlurText
               as="span"
-              text="Accessibility Statement"
+              text={title}
               className="text-primary"
               textClassName="text-primary"
               animateBy="words"
@@ -22,12 +79,20 @@ export default function AccessibilityPage() {
             />
           </h1>
 
-          <p className="body-default text-primary/80">
-            VIP Creative Studio is committed to providing a website experience that is
-            accessible, inclusive, and usable for as many people as possible,
-            including people with disabilities.
-          </p>
+          {legalPage?.intro ? (
+            <p className="body-default text-primary/80">{legalPage.intro}</p>
+          ) : (
+            <p className="body-default text-primary/80">
+              VIP Creative Studio is committed to providing a website experience that
+              is accessible, inclusive, and usable for as many people as possible,
+              including people with disabilities.
+            </p>
+          )}
 
+          {hasCmsBody ? (
+            <PortableTextRenderer value={legalPage!.body} />
+          ) : (
+            <>
           <section className="space-y-4">
             <h2 className="font-heading text-xl sm:text-2xl text-primary">
               Our approach
@@ -70,10 +135,10 @@ export default function AccessibilityPage() {
             <p className="body-default text-primary/80">
               Email: {" "}
               <a
-                href="mailto:hello@vipcreativestudio.com"
+                href="mailto: hello@vipcreative.studio"
                 className="text-accent-primary underline-offset-2 hover:underline"
               >
-                hello@vipcreativestudio.com
+                 hello@vipcreative.studio
               </a>
             </p>
             <p className="body-default text-primary/80">
@@ -106,6 +171,8 @@ export default function AccessibilityPage() {
               efforts.
             </p>
           </section>
+            </>
+          )}
         </div>
       </section>
     </main>

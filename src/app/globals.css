@@ -141,12 +141,12 @@
   .btn-white { @apply bg-background text-accent-primary border-2 border-border-standard hover:bg-accent-primary/10 hover:border-accent-primary; }
   .btn-white-teal { @apply bg-background text-accent-secondary border-2 border-accent-secondary hover:bg-accent-secondary/5 hover:border-accent-secondary; background-color: var(--background) !important; color: hsl(var(--accent-secondary)) !important; border-color: hsl(var(--accent-secondary)) !important; }
   .btn-inverted {
-    @apply bg-accent-secondary text-primary-foreground border-2 border-accent-secondary hover:scale-[1.02] hover:shadow-lg active:translate-y-0.5 active:opacity-95;
+    @apply bg-accent-secondary text-primary border-2 border-accent-secondary hover:scale-[1.02] hover:shadow-lg active:translate-y-0.5 active:opacity-95;
     background-color: hsl(var(--accent-secondary)) !important;
-    color: oklch(0.985 0 0) !important;
+    color: hsl(var(--text-primary)) !important;
     border-color: hsl(var(--accent-secondary)) !important;
   }
-  .btn-inverted * { color: oklch(0.985 0 0) !important; }
+  .btn-inverted * { color: hsl(var(--text-primary)) !important; }
   .btn-lift { @apply transform hover:-translate-y-0.5 active:translate-y-0; }
   .font-heading { font-family: var(--font-heading); }
   .font-body { font-family: var(--font-body); }
@@ -176,7 +176,7 @@
   }
   .h1 {
     font-family: var(--font-heading);
-    font-size: clamp(36px, 7.2vw, 96px);
+    font-size: clamp(32px, 5.5vw, 72px);
     line-height: 1.12;
     letter-spacing: -0.02em;
     font-weight: 900;

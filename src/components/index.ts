@@ -76,6 +76,7 @@ export { default as Textarea } from './ui/textarea';
 export { default as ContactForm } from './ui/contact-form';
 export { default as LeadCaptureForm } from './ui/lead-capture-form';
 export { default as DropdownMenu } from './ui/dropdown-menu';
+export { default as PortableTextRenderer } from './PortableTextRenderer';
 
 // Article/Insights Components
 export { default as ReadingProgress } from './shared/ReadingProgress';

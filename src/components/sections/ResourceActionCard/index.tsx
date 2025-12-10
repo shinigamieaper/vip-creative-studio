@@ -55,7 +55,7 @@ export function ResourceActionCard({
   // Format label for downloads
   const formatLabel = downloadable?.format || (isEbook ? "PDF" : isTemplate ? "Spreadsheet" : "File");
 
-  const handleSubmit = (data: { email: string; companyName: string }) => {
+  const handleSubmit = async (data: { email: string; companyName: string }) => {
     // Log lead data - backend integration will handle actual email sending
     console.log("Lead captured:", data, {
       resourceType,
@@ -68,6 +68,47 @@ export function ResourceActionCard({
     // 1. Save lead to database/CRM
     // 2. Add to newsletter
     // 3. Send email with download link or webinar confirmation
+
+    const payload = {
+      email: data.email,
+      companyName: data.companyName,
+      resourceTitle,
+      resourceType: isWebinar ? "webinar" : "download",
+      downloadUrl: downloadable?.downloadUrl,
+      webinarUrl: webinar?.registrationUrl || webinar?.recordingUrl
+    };
+
+    try {
+      const response = await fetch("/api/resources/lead", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payload)
+      });
+
+      if (!response.ok) {
+        const dataResponse = await response.json().catch(() => null);
+        const message = dataResponse?.error || "Unable to submit right now. Please try again later.";
+        if (typeof window !== "undefined") {
+          alert(message);
+        }
+        return;
+      }
+
+      if (typeof window !== "undefined" && (window as any).dataLayer) {
+        (window as any).dataLayer.push({
+          event: "resource_lead",
+          resourceType: payload.resourceType,
+          resourceTitle
+        });
+      }
+    } catch (error) {
+      console.error("Error submitting resource lead:", error);
+      if (typeof window !== "undefined") {
+        alert("Unable to submit right now. Please try again later.");
+      }
+    }
     
     // Modal will show success state with confetti - don't close it here
   };

@@ -51,9 +51,10 @@ export const BentoGridItem = ({
     : undefined;
 
   const borderClass = hasColor ? "border-transparent" : "border-standard";
-  const titleColor = hasColor ? "text-white" : "text-primary";
-  const descColor = hasColor ? "text-white/80" : "text-primary";
-  const iconColor = hasColor ? "[&_svg]:text-white" : "";
+  const usesLightText = isOrange || isDark;
+  const titleColor = usesLightText ? "text-white" : "text-primary";
+  const descColor = usesLightText ? "text-white/80" : "text-primary";
+  const iconColor = usesLightText ? "[&_svg]:text-white" : "";
 
   return (
     <div

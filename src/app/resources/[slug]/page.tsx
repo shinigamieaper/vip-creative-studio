@@ -243,7 +243,7 @@ export default async function ResourceDetailPage({ params }: PageProps) {
                     {topicLabel}
                   </span>
                   {resource.featured && (
-                    <span className="inline-flex items-center gap-1 px-3 py-1.5 bg-accent-primary text-background text-xs font-semibold rounded-full">
+                    <span className="inline-flex items-center gap-1 px-3 py-1.5 bg-accent-primary text-primary text-xs font-semibold rounded-full">
                       <Sparkles className="w-3 h-3" />
                       Featured
                     </span>
@@ -340,16 +340,32 @@ export default async function ResourceDetailPage({ params }: PageProps) {
                 }}
               >
                 <div className="flex items-center gap-2 mb-5">
-                  <Sparkles className="w-5 h-5 text-white" />
-                  <h2 className="font-heading font-bold text-lg text-white">Key Takeaways</h2>
+                  <Sparkles 
+                    className={`w-5 h-5 ${typeAccent === "primary" ? "text-white" : "text-primary"}`} 
+                  />
+                  <h2 
+                    className={`font-heading font-bold text-lg ${typeAccent === "primary" ? "text-white" : "text-primary"}`}
+                  >
+                    Key Takeaways
+                  </h2>
                 </div>
                 <ul className="space-y-3">
                   {resource.keyPoints.map((point, index) => (
                     <li key={index} className="flex items-start gap-3">
-                      <span className="shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold bg-white/20 text-white">
+                      <span 
+                        className={`shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
+                          typeAccent === "primary" ? "bg-white/20 text-white" : "bg-white text-primary"
+                        }`}
+                      >
                         {index + 1}
                       </span>
-                      <span className="text-sm text-white/90 leading-relaxed pt-0.5">{point}</span>
+                      <span 
+                        className={`text-sm leading-relaxed pt-0.5 ${
+                          typeAccent === "primary" ? "text-white/90" : "text-primary/80"
+                        }`}
+                      >
+                        {point}
+                      </span>
                     </li>
                   ))}
                 </ul>
@@ -599,7 +615,7 @@ export default async function ResourceDetailPage({ params }: PageProps) {
                     {topicLabel}
                   </span>
                   {resource.featured && (
-                    <span className="inline-flex items-center gap-1 px-3 py-1.5 bg-accent-primary text-background text-xs font-semibold rounded-full">
+                    <span className="inline-flex items-center gap-1 px-3 py-1.5 bg-accent-primary text-primary text-xs font-semibold rounded-full">
                       <Sparkles className="w-3 h-3" />
                       Featured
                     </span>
@@ -733,18 +749,20 @@ export default async function ResourceDetailPage({ params }: PageProps) {
                 style={{ backgroundColor: "hsl(var(--accent-secondary))" }}
               >
                 <div className="flex items-center gap-2 mb-5">
-                  <Sparkles className="w-5 h-5 text-white" />
-                  <h2 className="font-heading font-bold text-lg text-white">
+                  <Sparkles className="w-5 h-5 text-primary" />
+                  <h2 className="font-heading font-bold text-lg text-primary">
                     {isWebinar ? "What You'll Learn" : isEbook ? "What's Inside" : "Key Features"}
                   </h2>
                 </div>
                 <ul className="space-y-3">
                   {resource.keyPoints.map((point, index) => (
                     <li key={index} className="flex items-start gap-3">
-                      <span className="shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold bg-white/20 text-white">
+                      <span className="shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold bg-white text-primary">
                         {index + 1}
                       </span>
-                      <span className="text-sm text-white/90 leading-relaxed pt-0.5">{point}</span>
+                      <span className="text-sm text-primary/80 leading-relaxed pt-0.5">
+                        {point}
+                      </span>
                     </li>
                   ))}
                 </ul>
@@ -874,7 +892,7 @@ export default async function ResourceDetailPage({ params }: PageProps) {
                     Success Story
                   </span>
                   {resource.featured && (
-                    <span className="inline-flex items-center px-3 py-1 rounded-full bg-accent-primary text-background text-xs font-semibold uppercase tracking-[0.18em]">
+                    <span className="inline-flex items-center px-3 py-1 rounded-full bg-accent-primary text-primary text-xs font-semibold uppercase tracking-[0.18em]">
                       Featured
                     </span>
                   )}
@@ -1436,7 +1454,7 @@ export default async function ResourceDetailPage({ params }: PageProps) {
                     {getResourceTypeLabel(resource.type)}
                   </span>
                   {resource.featured && (
-                    <span className="inline-flex items-center px-3 py-1 rounded-full bg-accent-primary text-background text-xs font-semibold uppercase tracking-[0.18em]">
+                    <span className="inline-flex items-center px-3 py-1 rounded-full bg-accent-primary text-primary text-xs font-semibold uppercase tracking-[0.18em]">
                       Featured
                     </span>
                   )}
@@ -1592,7 +1610,7 @@ export default async function ResourceDetailPage({ params }: PageProps) {
                 {getResourceTypeLabel(resource.type)}
               </span>
               {resource.featured && (
-                <span className="inline-flex items-center gap-1 px-3 py-1 bg-accent-primary text-background text-xs font-bold rounded-full">
+                <span className="inline-flex items-center gap-1 px-3 py-1 bg-accent-primary text-primary text-xs font-bold rounded-full">
                   ⭐ Featured
                 </span>
               )}
