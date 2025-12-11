@@ -133,8 +133,8 @@ const EmailMarketingPlaceholder = () => (
 
 // Analytics chart component
 const AnalyticsChart = () => (
-  <div className="w-full h-full bg-linear-to-br from-accent-primary/5 to-accent-secondary/5 flex items-center justify-center p-2">
-    <ResponsiveContainer width="100%" height="100%">
+  <div className="w-full bg-linear-to-br from-accent-primary/5 to-accent-secondary/5 flex items-center justify-center p-2">
+    <ResponsiveContainer width="100%" aspect={2}>
       <AreaChart 
         data={analyticsData}
         margin={{ top: 5, right: 5, left: -20, bottom: 0 }}

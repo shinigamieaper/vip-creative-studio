@@ -4,6 +4,27 @@ const apiKey = process.env.MAILCHIMP_API_KEY;
 const serverPrefix = process.env.MAILCHIMP_SERVER_PREFIX;
 const audienceId = process.env.MAILCHIMP_AUDIENCE_ID;
 
+export class MailchimpApiError extends Error {
+  status: number;
+  title?: string;
+  detail?: string;
+
+  constructor(
+    message: string,
+    options: {
+      status: number;
+      title?: string;
+      detail?: string;
+    },
+  ) {
+    super(message);
+    this.name = "MailchimpApiError";
+    this.status = options.status;
+    this.title = options.title;
+    this.detail = options.detail;
+  }
+}
+
 function getBaseUrl() {
   if (!serverPrefix) {
     throw new Error("MAILCHIMP_SERVER_PREFIX is not configured.");
@@ -65,9 +86,24 @@ export async function syncMailchimpContact(options: {
 
   if (!memberResponse.ok) {
     const errorText = await memberResponse.text();
+    let parsedError: any;
+    try {
+      parsedError = JSON.parse(errorText);
+    } catch {
+      parsedError = undefined;
+    }
+
     // eslint-disable-next-line no-console
     console.error("Mailchimp member upsert failed:", memberResponse.status, errorText);
-    throw new Error("Failed to sync contact with Mailchimp.");
+
+    throw new MailchimpApiError(
+      parsedError?.detail || "Failed to sync contact with Mailchimp.",
+      {
+        status: memberResponse.status,
+        title: parsedError?.title,
+        detail: parsedError?.detail,
+      },
+    );
   }
 
   if (tags.length > 0) {
