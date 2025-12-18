@@ -15,7 +15,32 @@ import BrandShowcase from "./brand-showcase";
 
 export interface ServicesShowcaseProps
   extends React.ComponentPropsWithoutRef<"section"> {
-  servicesFromCms?: any[];
+  servicesFromCms?: CmsService[];
+}
+
+type ServiceColorVariant = "default" | "dark";
+
+interface ServiceTemplate {
+  slug: string;
+  title: string;
+  description: string;
+  icon: React.ReactNode;
+  header?: React.ReactNode;
+  colorVariant?: ServiceColorVariant;
+  className?: string;
+}
+
+type ResolvedService = ServiceTemplate & {
+  _id?: string;
+};
+
+interface CmsService {
+  _id?: string;
+  slug?: string | { current?: string };
+  title?: string;
+  subtitle?: string;
+  description?: string;
+  icon?: string;
 }
 
 interface HeaderBlockProps {
@@ -182,13 +207,15 @@ const AnalyticsChart = () => (
   </div>
 );
 
-const services = [
+const services: ServiceTemplate[] = [
   {
     slug: "branding-and-graphics",
     title: "Branding & Graphics",
     description: "Identity systems, guidelines, and logo suites aligned to strategy.",
     icon: <Brush className="h-5 w-5 text-primary" />,
     header: <BrandShowcase />,
+    colorVariant: "default" as const,
+    className: "md:col-span-2",
   },
   {
     slug: "seo-content-strategy",
@@ -196,6 +223,7 @@ const services = [
     description: "Data-backed content plans that grow qualified organic traffic.",
     icon: <Search className="h-5 w-5 text-primary" />,
     header: <SEOContentHeat />,
+    colorVariant: "dark" as const,
   },
   {
     slug: "paid-media-sem",
@@ -203,6 +231,7 @@ const services = [
     description: "High-intent acquisition across search and performance channels.",
     icon: <Rocket className="h-5 w-5 text-primary" />,
     header: <AcquisitionFunnel />,
+    colorVariant: "dark" as const,
   },
   {
     slug: "social-media-marketing",
@@ -210,6 +239,8 @@ const services = [
     description: "Full-funnel social programs with clear attribution.",
     icon: <Megaphone className="h-5 w-5 text-primary" />,
     header: <SocialMediaGrid />,
+    colorVariant: "default" as const,
+    className: "md:col-span-2",
   },
   {
     slug: "email-marketing",
@@ -217,6 +248,8 @@ const services = [
     description: "Lifecycle automation and CRM-integrated campaigns.",
     icon: <Mail className="h-5 w-5 text-primary" />,
     header: <EmailMarketing />,
+    colorVariant: "default" as const,
+    className: "md:col-span-2",
   },
   {
     slug: "analytics-and-reporting",
@@ -224,6 +257,7 @@ const services = [
     description: "Decision-grade dashboards and insight loops.",
     icon: <BarChart3 className="h-5 w-5 text-primary" />,
     header: <AnalyticsChart />,
+    colorVariant: "dark" as const,
   },
 ];
 
@@ -256,32 +290,76 @@ const getIconForService = (
   }
 };
 
+const getTemplateFromIconKey = (iconKey: string | undefined) => {
+  const normalizedKey = iconKey?.toLowerCase();
+
+  switch (normalizedKey) {
+    case "brush":
+      return services.find((template) => template.slug === "branding-and-graphics");
+    case "search":
+      return services.find((template) => template.slug === "seo-content-strategy");
+    case "rocket":
+      return services.find((template) => template.slug === "paid-media-sem");
+    case "megaphone":
+      return services.find((template) => template.slug === "social-media-marketing");
+    case "mail":
+      return services.find((template) => template.slug === "email-marketing");
+    case "barchart3":
+    case "barChart3":
+      return services.find((template) => template.slug === "analytics-and-reporting");
+    default:
+      return undefined;
+  }
+};
+
 const ServicesShowcase: React.FC<ServicesShowcaseProps> = ({
   className,
   servicesFromCms,
   ...props
 }) => {
-  const resolvedServices =
+  const resolvedServices: ResolvedService[] =
     servicesFromCms && Array.isArray(servicesFromCms) && servicesFromCms.length > 0
-      ? servicesFromCms.map((service: any, index: number) => {
-          const fallback = services[index] ?? services[0];
+      ? servicesFromCms.map((service: CmsService, index: number): ResolvedService => {
           const slugFromCms =
             typeof service.slug === "string"
               ? service.slug
               : service.slug?.current;
-          const slug = slugFromCms || fallback.slug;
-          const title = service.title || fallback.title;
-          const description =
-            service.subtitle || service.description || fallback.description;
-          const icon = getIconForService(service.icon, fallback.icon);
+          const templateFromSlug = slugFromCms
+            ? services.find((template) => template.slug === slugFromCms)
+            : undefined;
+          const templateFromIcon =
+            !templateFromSlug && typeof service.icon === "string"
+              ? getTemplateFromIconKey(service.icon)
+              : undefined;
+          const fallbackTemplate = services[index] ?? services[0];
+          const template = templateFromSlug ?? templateFromIcon ?? fallbackTemplate;
+          const hasTemplateMatch = Boolean(templateFromSlug ?? templateFromIcon);
 
-          return {
-            ...fallback,
-            slug,
-            title,
-            description,
-            icon,
-          };
+          const slug = slugFromCms || template.slug;
+          const title = service.title || template.title;
+          const description =
+            service.subtitle || service.description || template.description;
+          const icon = getIconForService(service.icon, template.icon);
+
+          return hasTemplateMatch
+            ? {
+                ...template,
+                _id: service._id,
+                slug,
+                title,
+                description,
+                icon,
+              }
+            : {
+                _id: service._id,
+                slug,
+                title,
+                description,
+                icon,
+                header: undefined,
+                colorVariant: "default" as const,
+                className: undefined,
+              };
         })
       : services;
 
@@ -319,11 +397,11 @@ const ServicesShowcase: React.FC<ServicesShowcaseProps> = ({
             <BentoGrid>
               {resolvedServices.map((s, i) => {
                 // Dark bg for SEO (colorful calendar pops), Paid Media (funnel), Analytics (chart)
-                const colorVariant = (i === 1 || i === 2 || i === 5) ? "dark" : "default";
+                const colorVariant = s.colorVariant ?? "default";
                 const isDark = colorVariant === "dark";
                 return (
                   <BentoGridItem
-                    key={i}
+                    key={s._id || s.slug || i}
                     title={s.title}
                     description={
                       <div className="space-y-2">
@@ -340,10 +418,14 @@ const ServicesShowcase: React.FC<ServicesShowcaseProps> = ({
                         </Link>
                       </div>
                     }
-                    header={<HeaderBlock className="min-h-48">{s.header}</HeaderBlock>}
+                    header={
+                      s.header ? (
+                        <HeaderBlock className="min-h-48">{s.header}</HeaderBlock>
+                      ) : undefined
+                    }
                     icon={s.icon}
                     colorVariant={colorVariant}
-                    className={`${i === 0 || i === 3 || i === 4 ? "md:col-span-2" : ""}`}
+                    className={s.className}
                   />
                 );
               })}

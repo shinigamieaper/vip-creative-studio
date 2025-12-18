@@ -16,10 +16,8 @@ import {
   NewsletterSignup,
 } from "@/components";
 import {
-  mockResources,
   getResourceGroup,
   topicConfigs,
-  getPrimaryTopicLabelForResource,
   type Resource,
   type ResourceGroup,
   type ResourceCategory,
@@ -88,10 +86,12 @@ const iconMap: Record<string, React.ReactNode> = {
 
 interface ResourcesPageClientProps {
   pageData: ResourcesPageData | null;
+  resources: Resource[];
 }
 
 export default function ResourcesPageClient({
   pageData,
+  resources,
 }: ResourcesPageClientProps) {
   const searchParams = useSearchParams();
   const resourcesSectionRef = useRef<HTMLElement | null>(null);
@@ -179,9 +179,9 @@ export default function ResourcesPageClient({
   const [searchQuery, setSearchQuery] = useState(initialSearchQuery);
   const [activeTag, setActiveTag] = useState<string | null>(initialTag);
 
-  // ----- Filtering logic (still uses mockResources for now) -----
+  // ----- Filtering logic -----
   const filteredResources = useMemo(() => {
-    let filtered: Resource[] = mockResources;
+    let filtered: Resource[] = resources;
 
     if (activeGroup !== "All") {
       filtered = filtered.filter(
@@ -216,15 +216,15 @@ export default function ResourcesPageClient({
     }
 
     return filtered;
-  }, [activeGroup, activeTopicId, activeTag, searchQuery, topics]);
+  }, [activeGroup, activeTag, activeTopicId, resources, searchQuery, topics]);
 
   // Featured resources
   const featuredResources = useMemo(() => {
-    const flagged = mockResources.filter((r) => r.featured);
+    const flagged = resources.filter((r) => r.featured);
     if (flagged.length > 0) return flagged;
-    if (mockResources.length === 0) return [];
-    return [mockResources[0]];
-  }, []);
+    if (resources.length === 0) return [];
+    return [resources[0]];
+  }, [resources]);
 
   const [featuredIndex, setFeaturedIndex] = useState(0);
 
@@ -310,13 +310,17 @@ export default function ResourcesPageClient({
           <div className="w-full max-w-[1140px] mx-auto px-6 md:px-10">
             <article className="group relative overflow-hidden rounded-[32px] border border-standard/80 transition-all duration-500 shadow-[0_8px_24px_rgba(15,23,42,0.06)] hover:border-accent-primary/40 hover:shadow-[0_10px_30px_rgba(15,23,42,0.1)]">
               <div className="relative min-h-[360px] sm:min-h-[460px] lg:min-h-[580px]">
-                <Image
-                  src={featuredResource.coverImage}
-                  alt={featuredResource.title}
-                  fill
-                  priority
-                  className="object-cover transition-transform duration-700 group-hover:scale-[1.04]"
-                />
+                {featuredResource.coverImage ? (
+                  <Image
+                    src={featuredResource.coverImage}
+                    alt={featuredResource.title}
+                    fill
+                    priority
+                    className="object-cover transition-transform duration-700 group-hover:scale-[1.04]"
+                  />
+                ) : (
+                  <div className="absolute inset-0 bg-linear-to-br from-accent-primary/10 via-accent-secondary/10 to-accent-primary/5" />
+                )}
 
                 <div className="pointer-events-none absolute inset-0 bg-linear-to-r from-black/80 via-black/45 to-black/10" />
 

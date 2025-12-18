@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import { HomepageHero, WhyChooseUs, Testimonials, ServicesShowcase, LatestInsights, NewsletterSignup } from "@/components";
 import { getClient } from "@/lib/sanity/client";
-import { homePageQuery, whyChooseUsSectionQuery, featuredTestimonialsQuery, servicesQuery } from "@/lib/sanity/queries";
+import { homePageQuery, whyChooseUsSectionQuery, featuredTestimonialsQuery, servicesQuery, latestInsightsResourcesQuery } from "@/lib/sanity/queries";
+
+export const revalidate = 60;
 
 const DEFAULT_HOME_METADATA: Metadata = {
   title: "Fractional Marketing for Credit Unions | VIP Creative Studio",
@@ -38,11 +40,12 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function Home() {
-  const [homePage, whyChooseUsSection, featuredTestimonials, services] = await Promise.all([
+  const [homePage, whyChooseUsSection, featuredTestimonials, services, latestInsights] = await Promise.all([
     getClient().fetch(homePageQuery),
     getClient().fetch(whyChooseUsSectionQuery),
     getClient().fetch(featuredTestimonialsQuery),
     getClient().fetch(servicesQuery),
+    getClient().fetch(latestInsightsResourcesQuery),
   ]);
 
   return (
@@ -69,7 +72,7 @@ export default async function Home() {
 
       <Testimonials sanityTestimonials={featuredTestimonials} />
       
-      <LatestInsights />
+      <LatestInsights resources={latestInsights ?? []} />
 
       {/* Newsletter Signup */}
       <section className="py-16">

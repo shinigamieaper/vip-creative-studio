@@ -9,7 +9,7 @@ import {
   FAQ
 } from "@/components";
 import { getClient } from "@/lib/sanity/client";
-import { aboutPageQuery, globalProcessQuery, faqGroupByKeyQuery, teamMembersQuery, partnershipPhilosophyQuery, kpiHighlightsQuery } from "@/lib/sanity/queries";
+import { aboutPageQuery, globalProcessQuery, faqGroupByKeyQuery, teamMembersQuery, partnershipPhilosophyQuery, kpiHighlightsQuery, featuredTestimonialsQuery } from "@/lib/sanity/queries";
 import type { FAQItem } from "@/components/sections/FAQ";
 
 const ABOUT_FAQ_ITEMS = [
@@ -75,6 +75,7 @@ export default async function AboutPage() {
     teamMembers,
     partnershipPhilosophy,
     kpiHighlights,
+    featuredTestimonials,
   ] = await Promise.all([
     getClient().fetch(aboutPageQuery),
     getClient().fetch(globalProcessQuery),
@@ -82,6 +83,7 @@ export default async function AboutPage() {
     getClient().fetch(teamMembersQuery),
     getClient().fetch(partnershipPhilosophyQuery),
     getClient().fetch(kpiHighlightsQuery),
+    getClient().fetch(featuredTestimonialsQuery),
   ]);
 
   const fallbackHeroTitle = "The Experts Behind Your Growth";
@@ -139,7 +141,7 @@ export default async function AboutPage() {
         subtitle={globalProcess?.subtitle}
         stepsOverride={globalProcess?.steps}
       />
-      <Testimonials />
+      <Testimonials sanityTestimonials={featuredTestimonials} />
       <KPIHighlights metricsFromCms={kpiHighlights?.metrics} />
       <FAQ
         items={faqItems}

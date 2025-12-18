@@ -80,6 +80,11 @@ export const serviceBySlugQuery = groq`
         features
       }
     },
+    faqs[] {
+      id,
+      question,
+      answer
+    },
     seo {
       metaTitle,
       metaDescription,
@@ -128,17 +133,17 @@ export const resourcesQuery = groq`
   *[_type == "resource"] | order(publishedAt desc) {
     _id,
     title,
-    slug,
+    "slug": slug.current,
     excerpt,
-    coverImage,
-    galleryImages,
+    "coverImage": coverImage.asset->url,
+    "galleryImages": galleryImages[].asset->url,
     category,
     type,
     tags,
     author-> {
       name,
       role,
-      avatar
+      "avatar": avatar.asset->url
     },
     publishedAt,
     readTime,
@@ -154,12 +159,13 @@ export const resourcesQuery = groq`
       speakers[] {
         name,
         role,
-        avatar
+        "avatar": avatar.asset->url
       }
     },
     downloadable {
       format,
-      fileSize
+      fileSize,
+      downloadUrl
     }
   }
 `;
@@ -168,16 +174,16 @@ export const featuredResourcesQuery = groq`
   *[_type == "resource" && featured == true] | order(publishedAt desc)[0...3] {
     _id,
     title,
-    slug,
+    "slug": slug.current,
     excerpt,
-    coverImage,
+    "coverImage": coverImage.asset->url,
     category,
     type,
     tags,
     author-> {
       name,
       role,
-      avatar
+      "avatar": avatar.asset->url
     },
     publishedAt,
     readTime,
@@ -194,21 +200,68 @@ export const featuredResourcesQuery = groq`
   }
 `;
 
-export const resourceBySlugQuery = groq`
-  *[_type == "resource" && slug.current == $slug][0] {
+export const latestInsightsResourcesQuery = groq`
+  *[_type == "resource" && type in ["Article", "Guide", "Report"]] | order(publishedAt desc)[0...3] {
     _id,
     title,
     "slug": slug.current,
     excerpt,
-    coverImage,
-    galleryImages,
+    "coverImage": coverImage.asset->url,
     category,
     type,
     tags,
     author-> {
       name,
       role,
-      avatar,
+      "avatar": avatar.asset->url
+    },
+    publishedAt,
+    readTime,
+    featured,
+    keyPoints
+  }
+`;
+
+export const relatedResourcesQuery = groq`
+  *[_type == "resource" && slug.current != $slug && (
+    ($group == "insights" && type in ["Article", "Guide", "Report"]) ||
+    ($group == "success-stories" && type == "Case Study") ||
+    ($group == "resources" && type in ["Webinar", "Template", "Tool", "Ebook"] && category == $category)
+  )] | order(publishedAt desc)[0...6] {
+    _id,
+    title,
+    "slug": slug.current,
+    excerpt,
+    "coverImage": coverImage.asset->url,
+    category,
+    type,
+    tags,
+    author-> {
+      name,
+      role,
+      "avatar": avatar.asset->url
+    },
+    publishedAt,
+    readTime,
+    featured
+  }
+`;
+
+export const resourceBySlugQuery = groq`
+  *[_type == "resource" && slug.current == $slug][0] {
+    _id,
+    title,
+    "slug": slug.current,
+    excerpt,
+    "coverImage": coverImage.asset->url,
+    "galleryImages": galleryImages[].asset->url,
+    category,
+    type,
+    tags,
+    author-> {
+      name,
+      role,
+      "avatar": avatar.asset->url,
       bio
     },
     publishedAt,
@@ -229,7 +282,7 @@ export const resourceBySlugQuery = groq`
       speakers[] {
         name,
         role,
-        avatar
+        "avatar": avatar.asset->url
       }
     },
     downloadable {
@@ -237,17 +290,17 @@ export const resourceBySlugQuery = groq`
       fileSize,
       downloadUrl,
       file,
-      previewImages,
+      "previewImages": previewImages[].asset->url,
       features
     },
     client {
       name,
       industry,
-      logo,
+      "logo": logo.asset->url,
       description,
       contactName,
       contactRole,
-      contactAvatar
+      "contactAvatar": contactAvatar.asset->url
     },
     resultsMetrics[] {
       label,
@@ -291,7 +344,7 @@ export const resourceBySlugQuery = groq`
 `;
 
 export const resourceSlugsQuery = groq`
-  *[_type == "resource"] { "slug": slug.current }
+  *[_type == "resource"] { "slug": slug.current, publishedAt }
 `;
 
 export const legalPageByKeyQuery = groq`

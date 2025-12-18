@@ -140,6 +140,40 @@ export default defineType({
       ],
     }),
     defineField({
+      name: "faqs",
+      title: "Service FAQs",
+      type: "array",
+      description: "Questions specific to this service, shown on the service detail page.",
+      of: [
+        {
+          type: "object",
+          fields: [
+            {
+              name: "id",
+              title: "ID (optional)",
+              type: "string",
+              description: "Stable identifier for this FAQ; if left empty it will be auto-generated.",
+            },
+            {
+              name: "question",
+              title: "Question",
+              type: "string",
+              description: "The FAQ question as it should appear on the site.",
+              validation: (Rule) => Rule.required(),
+            },
+            {
+              name: "answer",
+              title: "Answer",
+              type: "text",
+              rows: 3,
+              description: "Clear, helpful answer to the question.",
+              validation: (Rule) => Rule.required(),
+            },
+          ],
+        },
+      ],
+    }),
+    defineField({
       name: "order",
       title: "Display Order",
       type: "number",

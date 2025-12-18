@@ -1,7 +1,8 @@
 import { Suspense } from "react";
 import { getClient } from "@/lib/sanity/client";
-import { resourcesPageQuery } from "@/lib/sanity/queries";
+import { resourcesPageQuery, resourcesQuery } from "@/lib/sanity/queries";
 import ResourcesPageClient from "./ResourcesPageClient";
+import type { Resource } from "@/lib/resources/data";
 
 export type ResourcesPageData = {
   heroTitle?: string;
@@ -24,13 +25,14 @@ export type ResourcesPageData = {
 };
 
 export default async function ResourcesPage() {
-  const resourcesPageData: ResourcesPageData | null = await getClient().fetch(
-    resourcesPageQuery
-  );
+  const [resourcesPageData, resources] = await Promise.all([
+    getClient().fetch<ResourcesPageData | null>(resourcesPageQuery),
+    getClient().fetch<Resource[]>(resourcesQuery),
+  ]);
 
   return (
     <Suspense fallback={null}>
-      <ResourcesPageClient pageData={resourcesPageData} />
+      <ResourcesPageClient pageData={resourcesPageData} resources={resources ?? []} />
     </Suspense>
   );
 }

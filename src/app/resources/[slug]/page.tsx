@@ -11,42 +11,26 @@ import {
   CaseStudyImageGallery,
   LeadCaptureForm,
   ReadingProgress,
+  PortableTextRenderer,
   ArticleTableOfContents,
   PrimaryCtaButton,
   ResourceActionCard,
   NewsletterSignup
 } from "@/components";
 import {
-  getResourceBySlug,
-  mockResources,
   getResourceTypeLabel,
   getPrimaryTopicLabelForResource,
   getResourceGroup,
   type Resource
 } from "@/lib/resources/data";
 import { getClient } from "@/lib/sanity/client";
-import { resourceBySlugQuery, resourceSlugsQuery } from "@/lib/sanity/queries";
-import { urlFor } from "@/lib/sanity/image";
-
-function assertResource(resource: Resource | undefined): Resource {
-  if (!resource) {
-    notFound();
-  }
-  return resource;
-}
+import { relatedResourcesQuery, resourceBySlugQuery, resourceSlugsQuery } from "@/lib/sanity/queries";
 
 function mapSanityResourceToResource(doc: any): Resource {
-  const coverImageUrl = doc.coverImage ? urlFor(doc.coverImage).url() : "";
-  const galleryImageUrls = Array.isArray(doc.galleryImages)
-    ? doc.galleryImages
-        .map((img: any) => (img ? urlFor(img).url() : null))
-        .filter((url: string | null) => Boolean(url))
-    : undefined;
-
   const author = {
     name: doc.author?.name ?? "",
     role: doc.author?.role ?? "",
-    avatar: doc.author?.avatar ? urlFor(doc.author.avatar).url() : undefined,
+    avatar: doc.author?.avatar ?? undefined,
   };
 
   const publishedAt = doc.publishedAt
@@ -68,7 +52,7 @@ function mapSanityResourceToResource(doc: any): Resource {
           ? doc.webinar.speakers.map((speaker: any) => ({
               name: speaker.name ?? "",
               role: speaker.role ?? "",
-              avatar: speaker.avatar ? urlFor(speaker.avatar).url() : undefined,
+              avatar: speaker.avatar ?? undefined,
             }))
           : undefined,
         isLive: doc.webinar.isLive,
@@ -81,9 +65,7 @@ function mapSanityResourceToResource(doc: any): Resource {
         fileSize: doc.downloadable.fileSize,
         downloadUrl: doc.downloadable.downloadUrl ?? "",
         previewImages: Array.isArray(doc.downloadable.previewImages)
-          ? doc.downloadable.previewImages
-              .map((img: any) => (img ? urlFor(img).url() : null))
-              .filter((url: string | null) => Boolean(url))
+          ? doc.downloadable.previewImages.filter(Boolean)
           : undefined,
         features: doc.downloadable.features ?? [],
       }
@@ -93,13 +75,11 @@ function mapSanityResourceToResource(doc: any): Resource {
     ? {
         name: doc.client.name ?? "",
         industry: doc.client.industry,
-        logo: doc.client.logo ? urlFor(doc.client.logo).url() : undefined,
+        logo: doc.client.logo ?? undefined,
         description: doc.client.description,
         contactName: doc.client.contactName,
         contactRole: doc.client.contactRole,
-        contactAvatar: doc.client.contactAvatar
-          ? urlFor(doc.client.contactAvatar).url()
-          : undefined,
+        contactAvatar: doc.client.contactAvatar ?? undefined,
       }
     : undefined;
 
@@ -107,8 +87,10 @@ function mapSanityResourceToResource(doc: any): Resource {
     slug: doc.slug,
     title: doc.title ?? "",
     excerpt: doc.excerpt ?? "",
-    coverImage: coverImageUrl,
-    galleryImages: galleryImageUrls,
+    coverImage: doc.coverImage ?? "",
+    galleryImages: Array.isArray(doc.galleryImages)
+      ? doc.galleryImages.filter(Boolean)
+      : undefined,
     category: doc.category,
     type: doc.type,
     tags: doc.tags ?? [],
@@ -116,6 +98,8 @@ function mapSanityResourceToResource(doc: any): Resource {
     publishedAt,
     readTime: doc.readTime ?? 0,
     featured: doc.featured ?? false,
+    content: doc.content,
+    authorBio: doc.author?.bio,
     keyPoints: doc.keyPoints ?? [],
     tableOfContents: doc.tableOfContents ?? [],
     webinar,
@@ -130,20 +114,8 @@ function mapSanityResourceToResource(doc: any): Resource {
 }
 
 export async function generateStaticParams() {
-  const sanitySlugs: { slug: string }[] = await getClient().fetch(
-    resourceSlugsQuery
-  );
-
-  const mockSlugs = mockResources.map((resource) => ({
-    slug: resource.slug,
-  }));
-
-  const seen = new Set<string>();
-  return [...sanitySlugs, ...mockSlugs].filter(({ slug }) => {
-    if (seen.has(slug)) return false;
-    seen.add(slug);
-    return true;
-  });
+  const sanitySlugs: { slug: string }[] = await getClient().fetch(resourceSlugsQuery);
+  return sanitySlugs;
 }
 
 export interface PageProps {
@@ -155,9 +127,11 @@ export default async function ResourceDetailPage({ params }: PageProps) {
 
   const sanityResource = await getClient().fetch(resourceBySlugQuery, { slug });
 
-  const resource: Resource = sanityResource
-    ? mapSanityResourceToResource(sanityResource)
-    : assertResource(getResourceBySlug(slug));
+  if (!sanityResource) {
+    notFound();
+  }
+
+  const resource: Resource = mapSanityResourceToResource(sanityResource);
   
   const topicLabel = getPrimaryTopicLabelForResource(resource) ?? resource.category;
   const resourceGroup = getResourceGroup(resource.type);
@@ -165,26 +139,14 @@ export default async function ResourceDetailPage({ params }: PageProps) {
   const isCaseStudy = resource.type === "Case Study";
   const isResourcesBucket = resourceGroup === "resources";
 
-  // Get related resources
-  // For insights: use the entire insights bucket (same resource group) so the slider has
-  // multiple items to cycle through.
-  // For case studies: use the entire success-stories group for the slider.
-  // For other types: keep same-category behavior for now.
-  const relatedResources = mockResources.filter((r) => {
-    if (r.slug === resource.slug) return false;
-
-    const group = getResourceGroup(r.type);
-
-    if (isInsights) {
-      return group === "insights";
-    }
-
-    if (isCaseStudy) {
-      return group === "success-stories";
-    }
-
-    return r.category === resource.category && group === resourceGroup;
+  const sanityRelatedResources = await getClient().fetch(relatedResourcesQuery, {
+    slug,
+    group: resourceGroup,
+    category: resource.category,
   });
+  const relatedResources: Resource[] = Array.isArray(sanityRelatedResources)
+    ? sanityRelatedResources.map(mapSanityResourceToResource)
+    : [];
 
   // Determine type-specific accent color
   const typeAccent = resource.type === "Guide" 
@@ -381,102 +343,7 @@ export default async function ResourceDetailPage({ params }: PageProps) {
               {/* Main content */}
               <article className="max-w-[720px]">
                 <div className="prose prose-lg max-w-none">
-                  <div className="space-y-6 text-primary/80">
-                    {/* Section 1 */}
-                    <h2 id="understanding-volatility" className="font-heading font-bold text-2xl text-primary mt-0 mb-4 scroll-mt-24">
-                      Understanding Volatility
-                    </h2>
-                    <p className="text-base leading-relaxed">
-                      This is where the rich content would be rendered from Sanity CMS using PortableText.
-                      The content would include properly formatted paragraphs, headings, lists, images, code blocks, and other rich media elements.
-                    </p>
-                    <p className="text-base leading-relaxed">
-                      When integrated with Sanity, each section will be dynamically rendered based on the content blocks defined in your CMS schema.
-                      This placeholder demonstrates the visual structure and typography hierarchy.
-                    </p>
-                    
-                    {/* Section 2 */}
-                    <h2 id="risk-assessment" className="font-heading font-bold text-2xl text-primary mt-12 mb-4 scroll-mt-24">
-                      Risk Assessment Framework
-                    </h2>
-                    <p className="text-base leading-relaxed">
-                      A comprehensive risk assessment helps organizations understand their exposure and develop appropriate mitigation strategies.
-                      The framework should consider multiple factors including market conditions, regulatory environment, and operational capacity.
-                    </p>
-
-                    {/* Callout block */}
-                    <div className={`rounded-xl p-6 my-8 ${
-                      typeAccent === "primary" 
-                        ? "bg-accent-primary/5 border-l-4 border-accent-primary" 
-                        : "bg-accent-secondary/5 border-l-4 border-accent-secondary"
-                    }`}>
-                      <h3 className="font-heading font-bold text-base text-primary mb-2">💡 Pro tip</h3>
-                      <p className="text-sm text-primary/75 leading-relaxed">
-                        Start small with pilot programs to test new strategies before full-scale implementation.
-                        This approach minimizes risk while providing valuable insights for refinement.
-                      </p>
-                    </div>
-
-                    {/* Section 3 */}
-                    <h2 id="diversification-strategies" className="font-heading font-bold text-2xl text-primary mt-12 mb-4 scroll-mt-24">
-                      Diversification Strategies
-                    </h2>
-                    <p className="text-base leading-relaxed">
-                      Diversification remains one of the most effective tools for managing portfolio risk.
-                      By spreading investments across different asset classes, sectors, and geographies, investors can reduce their exposure to any single point of failure.
-                    </p>
-
-                    {/* Quote block */}
-                    <blockquote className="border-l-4 border-primary/20 pl-6 py-2 my-8">
-                      <p className="text-lg text-primary/70 italic leading-relaxed">
-                        "The key to successful investing is not predicting the future, but preparing for it."
-                      </p>
-                      <cite className="text-sm text-primary/50 not-italic">— Industry Expert</cite>
-                    </blockquote>
-
-                    {/* Section 4 */}
-                    <h2 id="regulatory-landscape" className="font-heading font-bold text-2xl text-primary mt-12 mb-4 scroll-mt-24">
-                      The Regulatory Landscape
-                    </h2>
-                    <p className="text-base leading-relaxed">
-                      Understanding the evolving regulatory environment is crucial for any financial institution.
-                      Compliance requirements continue to expand, and organizations must stay ahead of changes to avoid penalties and maintain customer trust.
-                    </p>
-
-                    {/* Section 5 */}
-                    <h2 id="practical-approach" className="font-heading font-bold text-2xl text-primary mt-12 mb-4 scroll-mt-24">
-                      A Practical Approach
-                    </h2>
-                    <p className="text-base leading-relaxed mb-6">
-                      Ready to put these insights into action? Here are the recommended next steps:
-                    </p>
-                    <div className="space-y-4">
-                      <div className="flex gap-4">
-                        <span className={`shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold text-white ${
-                          typeAccent === "primary" ? "bg-accent-primary" : "bg-accent-secondary"
-                        }`}>1</span>
-                        <p className="text-base leading-relaxed pt-1">
-                          Evaluate your current position and identify priority areas for improvement.
-                        </p>
-                      </div>
-                      <div className="flex gap-4">
-                        <span className={`shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold text-white ${
-                          typeAccent === "primary" ? "bg-accent-primary" : "bg-accent-secondary"
-                        }`}>2</span>
-                        <p className="text-base leading-relaxed pt-1">
-                          Develop a phased implementation plan with clear milestones and success metrics.
-                        </p>
-                      </div>
-                      <div className="flex gap-4">
-                        <span className={`shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold text-white ${
-                          typeAccent === "primary" ? "bg-accent-primary" : "bg-accent-secondary"
-                        }`}>3</span>
-                        <p className="text-base leading-relaxed pt-1">
-                          Engage stakeholders early and maintain open communication throughout the process.
-                        </p>
-                      </div>
-                    </div>
-                  </div>
+                  <PortableTextRenderer value={resource.content} />
                 </div>
 
                 {/* Author Bio Card - expanded */}
@@ -500,10 +367,11 @@ export default async function ResourceDetailPage({ params }: PageProps) {
                         <p className="text-[11px] text-primary/50 uppercase tracking-[0.18em] mb-1">About the author</p>
                         <h3 className="font-heading font-bold text-lg text-primary mb-1">{resource.author.name}</h3>
                         <p className="text-sm text-accent-primary font-medium mb-3">{resource.author.role}</p>
-                        <p className="text-sm text-primary/65 leading-relaxed">
-                          A seasoned professional with expertise in financial marketing and digital transformation.
-                          Passionate about helping credit unions and community banks grow through strategic innovation.
-                        </p>
+                        {resource.authorBio && (
+                          <p className="text-sm text-primary/65 leading-relaxed">
+                            {resource.authorBio}
+                          </p>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -1680,62 +1548,7 @@ export default async function ResourceDetailPage({ params }: PageProps) {
         <div className="w-full max-w-[1440px] mx-auto px-6 md:px-12 lg:px-16">
           <div className="max-w-4xl mx-auto">
           <div className="prose prose-lg max-w-none">
-            <div className="space-y-6 text-primary/80">
-              <p className="body-default leading-relaxed">
-                This is where the rich content would be rendered from Sanity CMS using PortableText or from MDX files.
-                The content would include properly formatted paragraphs, headings, lists, images, code blocks, and other rich media elements.
-              </p>
-              
-              <h2 className="h2 text-primary mt-10 mb-5">Key Insights</h2>
-              <ul className="space-y-3">
-                <li className="flex gap-3">
-                  <span className="text-accent-primary mt-1">•</span>
-                  <span className="body-default">Comprehensive analysis of current market trends and their implications for financial institutions</span>
-                </li>
-                <li className="flex gap-3">
-                  <span className="text-accent-primary mt-1">•</span>
-                  <span className="body-default">Actionable strategies that can be implemented immediately to drive measurable results</span>
-                </li>
-                <li className="flex gap-3">
-                  <span className="text-accent-primary mt-1">•</span>
-                  <span className="body-default">Real-world success stories demonstrating successful implementations across various sectors</span>
-                </li>
-              </ul>
-
-              <h2 className="h2 text-primary mt-10 mb-5">Implementation Strategy</h2>
-              <p className="body-default leading-relaxed">
-                The implementation of these strategies requires a systematic approach that considers both immediate needs
-                and long-term objectives. Organizations should begin by assessing their current capabilities and identifying
-                gaps that need to be addressed.
-              </p>
-              
-              <div className="bg-accent-primary/5 border border-accent-primary/20 rounded-[24px] p-6 my-8">
-                <h3 className="h3 text-primary mb-3">💡 Pro Tip</h3>
-                <p className="body-default text-primary/80">
-                  Start small with pilot programs to test new strategies before full-scale implementation.
-                  This approach minimizes risk while providing valuable insights for refinement.
-                </p>
-              </div>
-
-              <h2 className="h2 text-primary mt-10 mb-5">Next Steps</h2>
-              <p className="body-default leading-relaxed mb-6">
-                Ready to put these insights into action? Here's how to get started:
-              </p>
-              <ol className="space-y-3">
-                <li className="flex gap-3">
-                  <span className="text-accent-primary font-bold">1.</span>
-                  <span className="body-default">Evaluate your current position and identify priority areas for improvement</span>
-                </li>
-                <li className="flex gap-3">
-                  <span className="text-accent-primary font-bold">2.</span>
-                  <span className="body-default">Develop a phased implementation plan with clear milestones and success metrics</span>
-                </li>
-                <li className="flex gap-3">
-                  <span className="text-accent-primary font-bold">3.</span>
-                  <span className="body-default">Engage stakeholders early and maintain open communication throughout the process</span>
-                </li>
-              </ol>
-            </div>
+            <PortableTextRenderer value={resource.content} />
           </div>
           
           {/* Tags */}

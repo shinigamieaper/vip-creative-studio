@@ -7,9 +7,8 @@ import { ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { BlurText } from "@/components";
 import {
-  getFeaturedResources,
-  mockResources,
   getPrimaryTopicLabelForResource,
+  type Resource,
 } from "@/lib/resources/data";
 
 export interface LatestInsightsProps
@@ -18,6 +17,7 @@ export interface LatestInsightsProps
   heading?: string;
   accentText?: string;
   subheading?: string;
+  resources?: Resource[];
   /** Show "View all" link */
   showViewAll?: boolean;
   /** Auto-rotate interval in ms (default: 8000) */
@@ -29,17 +29,19 @@ const LatestInsights: React.FC<LatestInsightsProps> = ({
   heading = "Latest insights",
   accentText = "from our content hub",
   subheading = "Case studies, success stories, and resources for growth-focused financial teams.",
+  resources,
   showViewAll = true,
   rotateInterval = 8000,
   ...props
 }) => {
   // Get featured resources - same logic as Content Hub
   const featuredResources = useMemo(() => {
-    const flagged = getFeaturedResources();
+    const list = resources ?? [];
+    const flagged = list.filter((r) => r.featured);
     if (flagged.length > 0) return flagged;
-    if (mockResources.length === 0) return [];
-    return [mockResources[0]];
-  }, []);
+    if (list.length === 0) return [];
+    return [list[0]];
+  }, [resources]);
 
   const [featuredIndex, setFeaturedIndex] = useState(0);
 
@@ -109,12 +111,16 @@ const LatestInsights: React.FC<LatestInsightsProps> = ({
         <article className="group relative overflow-hidden rounded-[32px] border border-standard/80 transition-all duration-500 shadow-[0_8px_24px_rgba(15,23,42,0.06)] hover:border-accent-primary/40 hover:shadow-[0_10px_30px_rgba(15,23,42,0.1)]">
           <Link href={`/resources/${featured.slug}`} className="block">
             <div className="relative min-h-[360px] sm:min-h-[460px] lg:min-h-[520px]">
-              <Image
-                src={featured.coverImage}
-                alt={featured.title}
-                fill
-                className="object-cover transition-transform duration-700 group-hover:scale-[1.04]"
-              />
+              {featured.coverImage ? (
+                <Image
+                  src={featured.coverImage}
+                  alt={featured.title}
+                  fill
+                  className="object-cover transition-transform duration-700 group-hover:scale-[1.04]"
+                />
+              ) : (
+                <div className="absolute inset-0 bg-linear-to-br from-accent-primary/10 via-accent-secondary/10 to-accent-primary/5" />
+              )}
 
               {/* Dark gradient overlay */}
               <div className="pointer-events-none absolute inset-0 bg-linear-to-r from-black/80 via-black/45 to-black/10" />

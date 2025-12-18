@@ -11,7 +11,7 @@ import {
 } from "@/components";
 import { getServiceBySlug, getServiceSlugs, type ServiceSlug, type ServiceOutcome, type ServiceDefinition } from "@/lib/services/data";
 import { getClient } from "@/lib/sanity/client";
-import { serviceBySlugQuery, whyChooseUsSectionQuery } from "@/lib/sanity/queries";
+import { serviceBySlugQuery, whyChooseUsSectionQuery, featuredTestimonialsQuery, kpiHighlightsQuery } from "@/lib/sanity/queries";
 import type { FAQItem } from "@/components/sections/FAQ";
 
 const PARTNERSHIP_SERVICE_FAQ_ITEMS: Record<ServiceSlug, FAQItem[]> = {
@@ -178,9 +178,11 @@ export function generateStaticParams() {
 export default async function PartnershipModelSlugPage({ params }: { params: Promise<{ slug: ServiceSlug }> }) {
   const { slug } = await params;
 
-  const [sanityDoc, whyChooseUsSection] = await Promise.all([
+  const [sanityDoc, whyChooseUsSection, featuredTestimonials, kpiHighlights] = await Promise.all([
     getClient().fetch(serviceBySlugQuery, { slug }),
     getClient().fetch(whyChooseUsSectionQuery),
+    getClient().fetch(featuredTestimonialsQuery),
+    getClient().fetch(kpiHighlightsQuery),
   ]);
 
   const sanityService = sanityDoc ? mapSanityServiceToDefinition(sanityDoc) : undefined;
@@ -189,7 +191,20 @@ export default async function PartnershipModelSlugPage({ params }: { params: Pro
 
   if (!service) return notFound();
 
-  const faqItems = PARTNERSHIP_SERVICE_FAQ_ITEMS[slug];
+  const serviceFaqItemsFromCms: FAQItem[] | null =
+    sanityDoc?.faqs && Array.isArray(sanityDoc.faqs) && sanityDoc.faqs.length > 0
+      ? sanityDoc.faqs.map((item: any, index: number) => {
+          const fallback = PARTNERSHIP_SERVICE_FAQ_ITEMS[slug]?.[index];
+
+          return {
+            id: item.id || fallback?.id || String(index),
+            question: item.question || fallback?.question || "",
+            answer: item.answer || fallback?.answer || "",
+          };
+        })
+      : null;
+
+  const faqItems: FAQItem[] = serviceFaqItemsFromCms ?? PARTNERSHIP_SERVICE_FAQ_ITEMS[slug];
 
   const heroTitlePrefix = `${service.title} that delivers`;
   const fallbackHeroFlipWords = [
@@ -259,8 +274,8 @@ export default async function PartnershipModelSlugPage({ params }: { params: Pro
         highlightCard={whyChooseUsSection?.highlightCard}
       />
       <HowWeWorkSticky stepsOverride={processStepsOverride} />
-      <KPIHighlights />
-      <Testimonials />
+      <KPIHighlights metricsFromCms={kpiHighlights?.metrics} />
+      <Testimonials sanityTestimonials={featuredTestimonials} />
       {faqItems && faqItems.length > 0 && (
         <FAQ
           items={faqItems}

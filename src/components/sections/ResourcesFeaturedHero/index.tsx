@@ -42,13 +42,17 @@ const ResourcesFeaturedHero: React.FC<ResourcesFeaturedHeroProps> = ({
           <div className="grid grid-cols-1 lg:grid-cols-[1.2fr_1fr]">
             {/* Image + overlay */}
             <div className="relative min-h-[260px] sm:min-h-[320px] lg:min-h-[420px]">
-              <Image
-                src={resource.coverImage}
-                alt={resource.title}
-                fill
-                priority
-                className="object-cover"
-              />
+              {resource.coverImage ? (
+                <Image
+                  src={resource.coverImage}
+                  alt={resource.title}
+                  fill
+                  priority
+                  className="object-cover"
+                />
+              ) : (
+                <div className="absolute inset-0 bg-linear-to-br from-accent-primary/10 via-accent-secondary/10 to-accent-primary/5" />
+              )}
 
               <div className="pointer-events-none absolute inset-0 bg-linear-to-r from-black/65 via-black/40 to-transparent" />
 

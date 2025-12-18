@@ -1,6 +1,7 @@
 import { MetadataRoute } from "next";
 import { siteConfig } from "@/lib/site-config";
-import { mockResources } from "@/lib/resources/data";
+import { getClient } from "@/lib/sanity/client";
+import { resourceSlugsQuery } from "@/lib/sanity/queries";
 
 // Service slugs - will be replaced with Sanity query when CMS is integrated
 const servicesSlugs = [
@@ -12,7 +13,7 @@ const servicesSlugs = [
   "analytics-and-reporting",
 ];
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = siteConfig.url;
 
   // Static pages
@@ -89,9 +90,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
   }));
 
   // Resource pages (from mock data - will be replaced with Sanity query)
-  const resourcePages: MetadataRoute.Sitemap = mockResources.map((resource) => ({
+  const resources = await getClient().fetch<{ slug: string; publishedAt?: string }[]>(
+    resourceSlugsQuery
+  );
+
+  const resourcePages: MetadataRoute.Sitemap = (resources ?? []).map((resource) => ({
     url: `${baseUrl}/resources/${resource.slug}`,
-    lastModified: new Date(resource.publishedAt),
+    lastModified: resource.publishedAt ? new Date(resource.publishedAt) : new Date(),
     changeFrequency: "monthly" as const,
     priority: 0.6,
   }));

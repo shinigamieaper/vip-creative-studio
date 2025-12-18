@@ -26,6 +26,7 @@ const defaultFlipWords = [
 
 const HomepageHero: React.FC<HomepageHeroProps> = ({
   className = '',
+  heroEyebrow,
   heroTitle,
   heroFlipWords,
   heroSubtitle,
@@ -60,6 +61,11 @@ const HomepageHero: React.FC<HomepageHeroProps> = ({
             <div className="grid grid-cols-1 gap-12 lg:gap-16 items-center">
           {/* Content */}
           <div className="text-center">
+            {heroEyebrow && (
+              <div className="text-xs uppercase tracking-wide text-primary/60 font-medium mb-3">
+                {heroEyebrow}
+              </div>
+            )}
             <h1 className="h1 mb-6 max-w-6xl mx-auto flex flex-wrap justify-center items-baseline gap-x-2 text-balance">
               <BlurText
                 text={resolvedHeroTitle}

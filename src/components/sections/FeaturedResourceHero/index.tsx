@@ -6,7 +6,6 @@ import Image from "next/image";
 import { ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
-  getFeaturedResources,
   getPrimaryTopicLabelForResource,
   type Resource,
 } from "@/lib/resources/data";
@@ -22,7 +21,7 @@ const FeaturedResourceHero: React.FC<FeaturedResourceHeroProps> = ({
   resource,
   ...props
 }) => {
-  const featured = resource ?? getFeaturedResources()[0];
+  const featured = resource;
 
   if (!featured) return null;
 
@@ -49,13 +48,17 @@ const FeaturedResourceHero: React.FC<FeaturedResourceHeroProps> = ({
           <div className="grid grid-cols-1 lg:grid-cols-[1.2fr_1fr]">
             {/* Image */}
             <div className="relative min-h-[260px] sm:min-h-[320px] lg:min-h-[420px]">
-              <Image
-                src={featured.coverImage}
-                alt={featured.title}
-                fill
-                priority
-                className="object-cover"
-              />
+              {featured.coverImage ? (
+                <Image
+                  src={featured.coverImage}
+                  alt={featured.title}
+                  fill
+                  priority
+                  className="object-cover"
+                />
+              ) : (
+                <div className="absolute inset-0 bg-linear-to-br from-accent-primary/10 via-accent-secondary/10 to-accent-primary/5" />
+              )}
 
               {/* Gradient overlay on left side for legible text */}
               <div className="pointer-events-none absolute inset-0 bg-linear-to-r from-black/65 via-black/40 to-transparent" />
