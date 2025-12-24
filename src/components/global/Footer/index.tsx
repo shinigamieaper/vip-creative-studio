@@ -226,15 +226,26 @@ const Footer: React.FC<FooterProps> = ({ footer }) => {
             </motion.div>
 
             {/* Copyright */}
-            <motion.p 
+            <motion.div
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: 0.6 }}
               className="mt-5 sm:mt-6 text-center font-body text-xs text-primary/60"
             >
-              {bottomText}
-            </motion.p>
+              <p>{bottomText}</p>
+              <p className="mt-1">
+                Powered by{" "}
+                <a
+                  href="https://oyekolaobajuwon.vercel.app/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline underline-offset-4 hover:text-accent-primary transition-colors duration-300"
+                >
+                  Oyekola Obajuwon
+                </a>
+              </p>
+            </motion.div>
           </div>
         </div>
       </div>
