@@ -373,6 +373,7 @@ const Testimonials: React.FC<TestimonialProps> = ({
       ? sanityTestimonials.map((doc: any, index: number) => {
           const fallback = defaultTestimonials[index] ?? defaultTestimonials[0];
           const imageFromSanity = doc?.avatar ? urlFor(doc.avatar).url() : undefined;
+          const ctaHrefFromSanity = typeof doc?.ctaHref === 'string' ? doc.ctaHref.trim() : '';
 
           return {
             id: index,
@@ -382,7 +383,7 @@ const Testimonials: React.FC<TestimonialProps> = ({
             quote: doc?.quote ?? fallback?.quote ?? '',
             image: imageFromSanity ?? fallback?.image ?? '',
             metrics: fallback?.metrics,
-            successStoryUrl: doc?.ctaHref ?? fallback?.successStoryUrl,
+            successStoryUrl: ctaHrefFromSanity.length > 0 ? ctaHrefFromSanity : undefined,
           };
         })
       : testimonials;

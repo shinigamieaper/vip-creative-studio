@@ -12,6 +12,8 @@ import { getClient } from "@/lib/sanity/client";
 import { aboutPageQuery, globalProcessQuery, faqGroupByKeyQuery, teamMembersQuery, partnershipPhilosophyQuery, kpiHighlightsQuery, featuredTestimonialsQuery } from "@/lib/sanity/queries";
 import type { FAQItem } from "@/components/sections/FAQ";
 
+export const revalidate = 60;
+
 const ABOUT_FAQ_ITEMS = [
   {
     id: "who-you-work-with",

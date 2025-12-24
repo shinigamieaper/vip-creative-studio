@@ -3,6 +3,8 @@ import { siteConfig } from "@/lib/site-config";
 import { getClient } from "@/lib/sanity/client";
 import { resourceSlugsQuery } from "@/lib/sanity/queries";
 
+export const revalidate = 0;
+
 // Service slugs - will be replaced with Sanity query when CMS is integrated
 const servicesSlugs = [
   "branding-and-graphics",

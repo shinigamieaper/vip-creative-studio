@@ -487,7 +487,7 @@ export const homePageQuery = groq`
 `;
 
 export const aboutPageQuery = groq`
-  *[_type == "aboutPage"][0] {
+  *[_id in ["drafts.aboutPage", "aboutPage"]] | order(_id desc)[0] {
     heroEyebrow,
     heroTitle,
     heroSubtitle,
