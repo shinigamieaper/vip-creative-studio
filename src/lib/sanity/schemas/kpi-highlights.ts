@@ -4,39 +4,6 @@ export default defineType({
   name: "kpiHighlights",
   title: "KPI Highlights",
   type: "document",
-  initialValue: {
-    metrics: [
-      {
-        value: 250,
-        suffix: "+",
-        label: "Successful Campaigns",
-        description: "Delivered across industries",
-        iconKey: "campaigns",
-      },
-      {
-        value: 4.9,
-        suffix: "/5",
-        label: "Partner Rating",
-        description: "Average client satisfaction",
-        iconKey: "rating",
-      },
-      {
-        value: 320,
-        suffix: "%",
-        label: "Avg. ROAS Uplift",
-        description: "Return on ad spend increase",
-        iconKey: "roas",
-      },
-      {
-        value: 45,
-        prefix: "-",
-        suffix: "%",
-        label: "Reduced CAC",
-        description: "Customer acquisition cost",
-        iconKey: "cac",
-      },
-    ],
-  },
   fields: [
     defineField({
       name: "metrics",

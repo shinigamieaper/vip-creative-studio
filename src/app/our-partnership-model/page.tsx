@@ -111,7 +111,6 @@ export default async function PartnershipModelPage() {
       <ServicesHero
         titlePrefix={heroTitle}
         description={heroSubtitle}
-        showSecondary={false}
         primaryCtaLabel={primaryCtaLabel}
         primaryCtaHref={primaryCtaHref}
         secondaryCtaLabel={secondaryCtaLabel}

@@ -14,38 +14,6 @@ interface KPIMetric {
   description?: string;
 }
 
-const metrics: KPIMetric[] = [
-  {
-    value: 250,
-    suffix: '+',
-    label: 'Successful Campaigns',
-    icon: <TrendingUp className="w-5 h-5" />,
-    description: 'Delivered across industries'
-  },
-  {
-    value: 4.9,
-    suffix: '/5',
-    label: 'Partner Rating',
-    icon: <Award className="w-5 h-5" />,
-    description: 'Average client satisfaction'
-  },
-  {
-    value: 320,
-    suffix: '%',
-    label: 'Avg. ROAS Uplift',
-    icon: <Zap className="w-5 h-5" />,
-    description: 'Return on ad spend increase'
-  },
-  {
-    value: 45,
-    prefix: '-',
-    suffix: '%',
-    label: 'Reduced CAC',
-    icon: <Users className="w-5 h-5" />,
-    description: 'Customer acquisition cost'
-  }
-];
-
 interface CmsKpiMetric {
   value?: number;
   suffix?: string;
@@ -59,7 +27,7 @@ interface KPIHighlightsProps extends React.ComponentPropsWithoutRef<'section'> {
   metricsFromCms?: CmsKpiMetric[];
 }
 
-const getIconForMetric = (iconKey: string | undefined, fallbackIcon: React.ReactNode) => {
+const getIconForMetric = (iconKey: string | undefined) => {
   switch (iconKey) {
     case 'campaigns':
       return <TrendingUp className="w-5 h-5" />;
@@ -70,27 +38,34 @@ const getIconForMetric = (iconKey: string | undefined, fallbackIcon: React.React
     case 'cac':
       return <Users className="w-5 h-5" />;
     default:
-      return fallbackIcon;
+      return <TrendingUp className="w-5 h-5" />;
   }
 };
 
 const KPIHighlights: React.FC<KPIHighlightsProps> = ({ className = '', metricsFromCms, ...props }) => {
   const resolvedMetrics: KPIMetric[] =
     metricsFromCms && Array.isArray(metricsFromCms) && metricsFromCms.length > 0
-      ? metricsFromCms.map((metric, index) => {
-          const fallback = metrics[index] ?? metrics[0];
-          const icon = getIconForMetric(metric.iconKey, fallback.icon);
+      ? metricsFromCms
+          .map((metric): KPIMetric | null => {
+            if (!metric?.label || typeof metric.value !== 'number' || !Number.isFinite(metric.value)) {
+              return null;
+            }
 
-          return {
-            value: metric.value ?? fallback.value,
-            suffix: metric.suffix ?? fallback.suffix,
-            prefix: metric.prefix ?? fallback.prefix,
-            label: metric.label ?? fallback.label,
-            description: metric.description ?? fallback.description,
-            icon,
-          };
-        })
-      : metrics;
+            return {
+              value: metric.value,
+              suffix: metric.suffix,
+              prefix: metric.prefix,
+              label: metric.label,
+              description: metric.description,
+              icon: getIconForMetric(metric.iconKey),
+            };
+          })
+          .filter((metric): metric is KPIMetric => Boolean(metric))
+      : [];
+
+  if (resolvedMetrics.length === 0) {
+    return null;
+  }
 
   return (
     <section className={`py-20 px-4 relative overflow-hidden ${className}`} {...props}>
@@ -128,7 +103,7 @@ const KPIHighlights: React.FC<KPIHighlightsProps> = ({ className = '', metricsFr
 
             return (
               <motion.div
-                key={metric.label}
+                key={`${metric.label}-${index}`}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}

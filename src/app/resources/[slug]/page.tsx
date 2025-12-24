@@ -2,7 +2,7 @@ import React from "react";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import { Calendar, Clock, ArrowLeft, ChevronRight, User, TrendingUp, Heart, Zap, Quote, AlertCircle, Lightbulb, Target, CheckCircle2, Sparkles, BookOpen, Video, Download, Play, FileSpreadsheet, Check, Users } from "lucide-react";
+import { Calendar, Clock, ArrowLeft, ChevronRight, User, TrendingUp, Quote, AlertCircle, Lightbulb, Target, CheckCircle2, Sparkles, BookOpen, Video, Download, Play, FileSpreadsheet, Check, Users } from "lucide-react";
 import {
   RelatedInsightsSlider,
   ResourceActions,
@@ -838,12 +838,11 @@ export default async function ResourceDetailPage({ params }: PageProps) {
           </div>
         </section>
 
-        {/* Results metrics strip */}
-        <section className="pb-16">
-          <div className="w-full max-w-[1140px] mx-auto px-6 md:px-10">
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 lg:gap-8">
-              {resource.resultsMetrics && resource.resultsMetrics.length > 0 ? (
-                resource.resultsMetrics.map((metric, index) => (
+        {resource.resultsMetrics && resource.resultsMetrics.length > 0 && (
+          <section className="pb-16">
+            <div className="w-full max-w-[1140px] mx-auto px-6 md:px-10">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 lg:gap-8">
+                {resource.resultsMetrics.map((metric, index) => (
                   <div
                     key={index}
                     className="group relative bg-card border border-standard rounded-[20px] p-6 lg:p-8 shadow-[0_8px_24px_rgba(15,23,42,0.06)] hover:shadow-[0_10px_30px_rgba(15,23,42,0.08)] transition-all duration-300 hover:-translate-y-1"
@@ -866,96 +865,11 @@ export default async function ResourceDetailPage({ params }: PageProps) {
                       </p>
                     )}
                   </div>
-                ))
-              ) : (
-                <>
-                  {/* Metric Card 1 - Orange accent */}
-                  <div 
-                    className="group relative rounded-[20px] p-6 lg:p-8 border border-transparent shadow-[0_8px_24px_rgba(15,23,42,0.06)] hover:shadow-[0_10px_30px_rgba(15,23,42,0.08)] transition-all duration-300 hover:-translate-y-1"
-                    style={{ backgroundColor: "hsl(var(--accent-primary))" }}
-                  >
-                    {/* Icon */}
-                    <div className="mb-4 inline-flex items-center justify-center w-12 h-12 rounded-full bg-white/20 text-white group-hover:scale-110 transition-transform duration-300">
-                      <TrendingUp className="w-5 h-5" />
-                    </div>
-                    
-                    {/* Value */}
-                    <div className="mb-2">
-                      <span className="font-heading font-black text-4xl lg:text-5xl text-white inline-flex items-baseline">
-                        <CountUp to={220} className="inline" />
-                        <span className="ml-1">%</span>
-                      </span>
-                    </div>
-                    
-                    {/* Label */}
-                    <h3 className="font-heading font-bold text-sm uppercase tracking-wider text-white/80 mb-1">
-                      Digital Account Opens
-                    </h3>
-                    <p className="text-xs text-white/60">
-                      Increase in new accounts
-                    </p>
-                  </div>
-
-                  {/* Metric Card 2 - Neutral */}
-                  <div className="group relative bg-card border border-standard rounded-[20px] p-6 lg:p-8 shadow-[0_8px_24px_rgba(15,23,42,0.06)] hover:shadow-[0_10px_30px_rgba(15,23,42,0.08)] transition-all duration-300 hover:-translate-y-1">
-                    {/* Icon */}
-                    <div className="mb-4 inline-flex items-center justify-center w-12 h-12 rounded-full bg-accent-primary/10 text-accent-primary group-hover:scale-110 transition-transform duration-300">
-                      <Heart className="w-5 h-5" />
-                    </div>
-                    
-                    {/* Value */}
-                    <div className="mb-2">
-                      <span className="font-heading font-black text-4xl lg:text-5xl text-primary inline-flex items-baseline">
-                        <CountUp to={40} className="inline" />
-                        <span className="ml-1">%</span>
-                      </span>
-                    </div>
-                    
-                    {/* Label */}
-                    <h3 className="font-heading font-bold text-sm uppercase tracking-wider text-primary/80 mb-1">
-                      Customer Satisfaction
-                    </h3>
-                    <p className="text-xs text-primary/60">
-                      Lift in CSAT scores
-                    </p>
-                    
-                    {/* Subtle gradient overlay */}
-                    <div className="absolute top-0 right-0 w-24 h-24 opacity-5 pointer-events-none"
-                      style={{ background: 'radial-gradient(circle at top right, hsl(var(--accent-primary)) 0%, transparent 70%)' }}
-                    />
-                  </div>
-
-                  {/* Metric Card 3 - Teal accent */}
-                  <div 
-                    className="group relative rounded-[20px] p-6 lg:p-8 border border-transparent shadow-[0_8px_24px_rgba(15,23,42,0.06)] hover:shadow-[0_10px_30px_rgba(15,23,42,0.08)] transition-all duration-300 hover:-translate-y-1"
-                    style={{ backgroundColor: "hsl(var(--accent-secondary))" }}
-                  >
-                    {/* Icon */}
-                    <div className="mb-4 inline-flex items-center justify-center w-12 h-12 rounded-full bg-white/20 text-white group-hover:scale-110 transition-transform duration-300">
-                      <Zap className="w-5 h-5" />
-                    </div>
-                    
-                    {/* Value */}
-                    <div className="mb-2">
-                      <span className="font-heading font-black text-4xl lg:text-5xl text-white inline-flex items-baseline">
-                        <CountUp to={65} className="inline" />
-                        <span className="ml-1">%</span>
-                      </span>
-                    </div>
-                    
-                    {/* Label */}
-                    <h3 className="font-heading font-bold text-sm uppercase tracking-wider text-white/80 mb-1">
-                      Processing Time
-                    </h3>
-                    <p className="text-xs text-white/60">
-                      Reduction in turnaround
-                    </p>
-                  </div>
-                </>
-              )}
+                ))}
+              </div>
             </div>
-          </div>
-        </section>
+          </section>
+        )}
 
         {/* Case Study Content */}
         <section className="pb-20">
