@@ -55,9 +55,9 @@ export default function ContactPage() {
             Email: {" "}
             <a
               className="text-accent-primary underline-offset-2 hover:underline"
-              href="mailto:requests@vipcreative.studio"
+              href="mailto:hello@vipcreative.studio"
             >
-              requests@vipcreative.studio
+              hello@vipcreative.studio
             </a>
           </p>
         </div>
