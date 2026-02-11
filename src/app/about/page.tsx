@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { 
   AboutHero, 
-  TeamIDCards, 
   PartnershipPhilosophy,
   KPIHighlights,
   HowWeWorkSticky,
@@ -132,7 +131,7 @@ export default async function AboutPage() {
         secondaryCtaLabel={secondaryCtaLabel}
         secondaryCtaHref={secondaryCtaHref}
       />
-      <TeamIDCards sanityMembers={teamMembers} />
+     
       <PartnershipPhilosophy
         title={partnershipPhilosophy?.title}
         subtitle={partnershipPhilosophy?.subtitle}
